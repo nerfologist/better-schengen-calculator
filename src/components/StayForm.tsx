@@ -57,7 +57,9 @@ export function StayForm({ initial, onSave, onCancel }: StayFormProps) {
           />
         </label>
         <label>
-          Label <span className="muted">(optional)</span>
+          <span>
+            Label <span className="muted">(optional)</span>
+          </span>
           <input
             type="text"
             placeholder="e.g. Paris trip"
