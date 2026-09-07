@@ -1,10 +1,17 @@
-import { toDayNum } from '../../domain/dates'
+import { toDayNum, toIso } from '../../domain/dates'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
 import { MonthGrid } from './MonthGrid'
 
 const MONTHS_BACK = 6
 const MONTHS_FORWARD = 1
+const MAX_MONTHS_FORWARD = 12
+
+/** Year*12 + month index, for month arithmetic. */
+function monthIndexOf(day: number): number {
+  const [y, m] = toIso(day).split('-').map(Number)
+  return y * 12 + (m - 1)
+}
 
 export interface TimelineProps {
   /** Range being previewed by a planning tool, if any. */
@@ -16,10 +23,22 @@ export function Timeline({ preview }: TimelineProps) {
   const todayNum = toDayNum(today)
 
   const [y, m] = today.split('-').map(Number)
+  const todayIdx = y * 12 + (m - 1)
+
+  // Extend forward past the default when a previewed trip or a recorded
+  // future stay would otherwise fall off the end (capped to a year ahead).
+  const lastRelevant = Math.max(
+    preview?.end ?? 0,
+    mergedRanges.length > 0 ? mergedRanges[mergedRanges.length - 1].end : 0,
+  )
+  const endIdx = Math.min(
+    Math.max(todayIdx + MONTHS_FORWARD, lastRelevant > 0 ? monthIndexOf(lastRelevant) : 0),
+    todayIdx + MAX_MONTHS_FORWARD,
+  )
+
   const months: { year: number; month0: number }[] = []
-  for (let i = -MONTHS_BACK; i <= MONTHS_FORWARD; i++) {
-    const date = new Date(Date.UTC(y, m - 1 + i, 1))
-    months.push({ year: date.getUTCFullYear(), month0: date.getUTCMonth() })
+  for (let idx = todayIdx - MONTHS_BACK; idx <= endIdx; idx++) {
+    months.push({ year: Math.floor(idx / 12), month0: idx % 12 })
   }
 
   return (
