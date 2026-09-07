@@ -1,0 +1,1473 @@
+<html><head>
+	<title>Schengen-calculator </title>
+	<meta charset="utf-8">
+	
+	<script src="./jquery.js"></script>
+	<script src="./purl.js"></script>
+
+	<script type='text/javascript'>
+		translations = [
+		   {
+			  "language":"en", 
+			  "main_title":"Calculator of travel days remaining <br/>under a Schengen short-stay visa", 
+			  "date_of_entry_control_text_field":"Date of entry/Control:", 
+			  "planning_radio_button":"Planning", 
+			  "control_radio_button":"Control ", 
+			  "passport_check_box":"Passport ", 
+			  "entry_exit_data_columns":"Enter previous stay(s)<br/>in the Schengen area", 
+			  "cmdCalculate":"Calculate", 
+			  "user_guide_link":"User's guide", 
+			  "cmdReset":"Reset", 
+			  "help_date_of_entry_control_text_field":"Date of entry/Control: \n\nWhen opening the calculator this field is automatically prefilled with the date of today. It can be changed to an earlier date (to check the compliance with the '90 days/180-day' rule in the past) or to a date in the future (to check the maximum length of stay which may be allowed on that particular day). The date must be entered in the following format: DDMMYY and it should be later than 22 April 2013.", 
+			  "help_planning_and_control_radio_button":"Planning and Control  \n\nPlanning:  \nUse this option to check the maximum length of stay which may be allowed on a particular day in the future. This date is to be introduced as a date of entry to the 'Date of entry/Control' box. \n\nControl:  \nUse this option to calculate the length of previous and/or on-going stays and get an answer on the compliance with the '90 days/180-day' rule (on the day of control).", 
+			  "help_passport_check_box":"Passport: \n\nAllows entering entry and exit dates in random - non-chronological - order.", 
+			  "help_date_of_entry_text_fields_when_passport_is_not_checked":"Date of entry: \n\nDates of entry/entries on the basis of the entry stamp(s) affixed by the authorities of one of the Schengen States in the past 180 days. Periods of stay authorised under a residence permit or a long-stay visa (D-type visa) shall not be taken into account in the calculation. Accordingly, the dates of the entries (if any) related to residence permit or a long-stay visa in a particular Schengen State shall not be added.", 
+			  "help_date_of_exit_text_fields_when_passport_is_not_checked":"Date of exit: \n\nCorresponding exit date(s) based on the stamp(s) in the passport.", 
+			  "help_text_for_days_of_stay_information_fields_when_passport_is_not_checked":"Days of stay: \n\nLength of the stay in days. This field is calculated after the entry and exit days for the current stay are provided.", 
+			  "help_date_text_fields_when_passport_is_checked":"Date: \n\nDates of entry and exit respectively in the following formats: +DDMMYY and -DDMMYY, e.g. +010114 stands for an entry stamp in the passport of 1 January 2014, while -010214 stands for an exit stamp of 1 February 2014.", 
+			  "help_reset_button":"Reset button: \n\nClear ALL entries. Entries in specific boxes can be deleted individually using the keyboard.", 
+			  "messageStartDate_variable":"The date of entry into force of the 'new' definition of 'short stay' is 18 October 2013 and therefore the calculator cannot be used for entries/stays earlier than 22 April 2013 (= 18.10.13 minus six months).  The calculator does not support calculation of entries/stays earlier than 22 April 2013. The 'old' definition applies for such entries/stays (3 months in 6 months from the date of first entry).", 
+			  "settingDate_isValidChar_and_setup_functions":"The only valid caracters are numbers and /", 
+			  "settingDate_and_setup_functions_1":"The date [DATE1] is not a valid date", 
+			  "settingDate_and_setup_functions_2":"The date [DATE1] must be on the following format ddmmyy or dd/mm/yy", 
+			  "cleanForm_function":"Are you sure you want reset the form? Answering OK will erase all entered data.", 
+			  "setup_function":"the first caracter must be + or -", 
+			  "sortCron_function":"The stays are not in chronological order. Press OK to sort the stays and Cancel to edit the stays.", 
+			  "report":"Calculation results will display in this area.", 
+			  "leggInndager_function_1":"Days of stay in the 180-days period from [DATE1] to [DATE2]: [NUMBER3] day(s)", 
+			  "leggInndager_function_2":"Overstay in the period from [DATE1] to [DATE2] ([NUMBER3] days)", 
+			  "feedback_function_1":"The stay with exit date [DATE1] has no entering date", 
+			  "feedback_function_2":"The stay with entering date [DATE1] has no exit date", 
+			  "feedback_function_3":"The stay with entering date [DATE1] is later than the exit date [DATE2]", 
+			  "feedback_function_4":"The exit date [DATE1] is later than the Entry/Control date [DATE2]", 
+			  "feedback_function_5":"The stay with entering date [DATE1] is before exit date in the previous stay [DATE2]", 
+			  "feedback_function_6":"Calculation of stay is not possible", 
+			  "BeregnVisa_function_1":"Start of 90 days period: [DATE1]", 
+			  "BeregnVisa_function_2":"Start of 180 days period: [DATE1]", 
+			  "BeregnVisa_function_3":"The stay may be authorised for up to: [NUMBER1] day(s)", 
+			  "BeregnVisa_and_BeregnControl_function":"At [DATE1] a stay may be authorized for [NUMBER2] days", 
+			  "BeregnControl_function_1":"No overstay in the registration period.", 
+			  "BeregnControl_function_2":"A stay may not be authorised.", 
+			  "BeregnControl_function_3":"Possible stay until [DATE1]", 
+			  "BeregnControl_function_4":"For holder of a short stay visa, remember to check the number of days on the visa sticker or in the VIS", 
+			  "disclaimer":"The calculator is a helping tool only; it<br/>does not constitute a right to stay for a<br/>period resulting from its calculation."
+		   }, 
+		   {
+			  "language":"fr", 
+			  "main_title":"Calculatrice des jours de voyage restant à accomplir <br/>sous couvert d'un visa de court séjour Schengen", 
+			  "date_of_entry_control_text_field":"Date d'entrée/contrôle", 
+			  "planning_radio_button":"Prévision", 
+			  "control_radio_button":"Contrôle", 
+			  "passport_check_box":"Passeport", 
+			  "entry_exit_data_columns":"Saisir le(s) séjour(s) antérieur(s)<br/>dans l'espace Schengen", 
+			  "cmdCalculate":"Calculer ", 
+			  "user_guide_link":"Mode d'emploi", 
+			  "cmdReset":"Réinitialiser", 
+			  "help_date_of_entry_control_text_field":"Date d'entrée/contrôle: \n\nLorsque l'on active la calculatrice ce champ est automatiquement prérempli à la date d'aujourd'hui. Elle peut être remplacée par une date antérieure (afin de vérifier le respect de la règle des 90 jours sur 180 jours dans le passé) ou par une date future (pour vérifier la durée maximale du séjour pouvant être autorisé ce jour donné). La date doit être saisie dans le format suivant: JJMMAA et elle doit être ultérieure au 22 avril 2013.", 
+			  "help_planning_and_control_radio_button":"Prévision et contrôle \n\nPrévision: \nCette option vous permet de vérifier la durée maximale de séjour autorisée à une date future donnée. Cette date doit être saisie en tant que date d'entrée dans le champ 'Date d'entrée/contrôle'. \n\nContrôle: \nUtilisez cette option pour calculer la durée des séjours antérieurs et/ou en cours et obtenez une réponse concernant le respect de la règle de '90 jours sur /180-jours' (à la date du contrôle).", 
+			  "help_passport_check_box":"Passeport: \n\nPermet de saisir les dates d'entrée et de sortie dans un ordre aléatoire -non chronologique.", 
+			  "help_date_of_entry_text_fields_when_passport_is_not_checked":"Date d'entrée: \n\nDates d'entrée/entrées sur la base des cachets d'entrée apposés par les autorités d'un des États Schengen au cours des 180 derniers jours. Les périodes de séjour autorisées dans le cadre d'un titre de séjour ou d'un visa de long séjour (visa de type D) ne sont pas comptabilisées. Il ne faut donc pas ajouter les dates d'entrée (s'il y en a) dans le cadre d'un titre de séjour ou d'un visas de long séjour dans un État Schengen donné.", 
+			  "help_date_of_exit_text_fields_when_passport_is_not_checked":"Date de sortie: \n\nDate(s) de sortie correspondante(s) sur la base du/des cachet(s) du passeport.", 
+			  "help_text_for_days_of_stay_information_fields_when_passport_is_not_checked":"Jours de séjour: \n\nDurée du séjour en jours . Ce champ est calculé sur la base des jours d'entrée et de sortie fournis.", 
+			  "help_date_text_fields_when_passport_is_checked":"Date: \n\nDates d'entrée et de sortie respectivement dans les formats suivants: +JJMMAA et -JJMMAA, ex. +010114 équivaut à un cachet d'entrée dans le passeport à la date du 1er  janvier 2014, tandis que -010214 représente un cachet de sortie à la date du 1er février 2014.", 
+			  "help_reset_button":"Bouton de réinitialisation: \n\nEfface TOUTES les entrées. Les entrées des champs séparés peuvent être effacées à l'aide des touches du clavier.", 
+			  "messageStartDate_variable":"La date d'entrée en vigueur de la 'nouvelle' définition de 'court séjour' est le 18 octobre 2013 de sorte que la calculatrice ne peut pas être utilisée pour des séjours antérieurs au 22 avril 2013 (= 18.10.13 moins six mois). Elle n'admet pas le calcul d'entrées/séjours avant le 22 avril 2013. l''ancienne' définition s'applique à ces entrées/séjours (3 mois sur 6 mois à compter de la date de première entrée).", 
+			  "settingDate_isValidChar_and_setup_functions":"Les seuls caractères valables sont les chiffres et le /", 
+			  "settingDate_and_setup_functions_1":"La date [DATE1] n'est pas une date valable", 
+			  "settingDate_and_setup_functions_2":"La date [DATE1] doit être saisie dans le format suivant jjmmaa ou jj/mm/aa", 
+			  "cleanForm_function":"Êtes-vous sûr de vouloir réinitialiser le formulaire? En répondant OK vous effacez toutes les données saisies.", 
+			  "setup_function":"Le premier caractère doit être + ou -", 
+			  "sortCron_function":"Les séjours ne sont pas dans l'ordre chronologique. Veuillez cliquer sur OK pour trier les séjours et sur Cancel pour les éditer.", 
+			  "report":"Les résultats du calcul apparaîtront dans cette zone.", 
+			  "leggInndager_function_1":"Jours de séjour au cours de la période de 180 jours  du [DATE1] au [DATE2]: ([NUMBER3] jours)", 
+			  "leggInndager_function_2":"Dépassement du séjour au cours de  la période du [DATE1] au [DATE2] ([NUMBER3] jours)", 
+			  "feedback_function_1":"Le séjour avec comme date de sortie le [DATE1] n'a pas de date d'entrée", 
+			  "feedback_function_2":"Le séjour avec comme date d'entrée le [DATE1] n'a pas de date de sortie", 
+			  "feedback_function_3":"Le séjour avec comme date d'entrée le [DATE1] dépasse la date de sortie [DATE2]", 
+			  "feedback_function_4":"La date de sortie [DATE1]  dépasse la date d'entrée/contrôle [DATE2]", 
+			  "feedback_function_5":"Le séjour avec comme date d'entrée le [DATE1] est antérieur à la date de sortie du séjour précédent [DATE2]", 
+			  "feedback_function_6":"Le calcul du séjour est impossible", 
+			  "BeregnVisa_function_1":"Début de la période de 90 jours: [DATE1]", 
+			  "BeregnVisa_function_2":"Début de la période de 180 jours [DATE1]", 
+			  "BeregnVisa_function_3":"Le séjour peut être autorisé pour un maximum de: [NUMBER1] jours", 
+			  "BeregnVisa_and_BeregnControl_function":"Le [DATE1], un séjour peut être autorisé pour [NUMBER2] de jours", 
+			  "BeregnControl_function_1":"Pas de dépassement de séjour au cours de la période d'enregistrement.", 
+			  "BeregnControl_function_2":"Pas de séjour autorisé.", 
+			  "BeregnControl_function_3":"Séjour possible jusqu'au [DATE1]", 
+			  "BeregnControl_function_4":"Pour le titulaire d'un visa de court séjour, n'oubliez pas de vérifier le nombre de jours indiqué sur la vignette visa ou dans le VIS", 
+			  "disclaimer":"La calculatrice ne constitue qu'un outil<br/>d'aide; elle ne n'ouvre pas un droit à<br/>séjourner d'une durée équivalant au<br/>résultat calculé."
+		   }, 
+		   {
+			  "language":"tr", 
+			  "main_title":"Schengen kısa süreli kalma vizesi kapsamında <br/>kalan seyahat günleri hesaplayıcısı", 
+			  "date_of_entry_control_text_field":"Giriş tarihi/Kontrol:", 
+			  "planning_radio_button":"Planlama", 
+			  "control_radio_button":"Kontrol", 
+			  "passport_check_box":"Pasaport", 
+			  "entry_exit_data_columns":"Schengen alanına eski<br/>giriş(leri)  girin", 
+			  "cmdCalculate":"Hesapla", 
+			  "user_guide_link":"Kullanım kılavuzu", 
+			  "cmdReset":"Sıfırla", 
+			  "help_date_of_entry_control_text_field":"Giriş tarihi/Kontrol: \n\nHesaplayıcı açılırken bu alan kendiliğinden bugünün tarihiyle hazır olacaktır. Önceki bir tarihe (geçmişteki '90 gün/180 gün' kuralıyla olan uyumunu kontrol etmek amacıyla) ya da gelecekteki bir tarihe (o belirli günde izin verilebilecek en uzun kalma süresini kontrol etmek amacıyla) değiştirilebilir. Tarih aşağıdaki formatta girilmelidir: GÜNAYYIL ve 22 Nisan 2013' ten sonraki bir tarih olmalıdır.", 
+			  "help_planning_and_control_radio_button":"Planlama ve Kontrol \n\nPlanlama: \nBu seçeneği gelecekte belirli bir günde izin verilebilecek en uzun kalma süresini kontrol etmek amacıyla kullanın. Bu tarihin 'Giriş tarihi/Kontrol' kutucuğuna giriş tarihi olarak girilmesi gerekmektedir. \n\nKontrol: \nBu seçeneği önceki ve/veya devam etmekte olan kalışları hesaplamak ve '90 gün/180 gün' kuralına uygunluk konusunda bir cevap almak için (kontrol gününde) kullanın.", 
+			  "help_passport_check_box":"Pasaport: \n\nGiriş ve çıkış tarihlerini rasgele - kronolojik olmayan - bir sırayla girmeye olanak sağlar.", 
+			  "help_date_of_entry_text_fields_when_passport_is_not_checked":"Giriş tarihi: \n\nSon 180 gün içinde bir Schengen Ülkesi' nin yetkilileri tarafından basılan giriş mührüne dayalı olarak giriş veya girişlerin tarihleri. Oturma izni veya uzun süreli vize (D-tipi vize) altında izin verilen kalma dönemleri hesaplamada dikkate alınmayacaktır. Bu doğrultuda, belirli bir Schengen Ülkesi 'nde oturma iznine ya da uzun süreli vizeye ilişkin girişlerin tarihleri (varsa bile), eklenmeyecektir.", 
+			  "help_date_of_exit_text_fields_when_passport_is_not_checked":"Çıkış tarihi: \n\nPasaportta bulunan mühür veya mühürlere dayanan ilgili çıkış tarihi veya tarihleri.", 
+			  "help_text_for_days_of_stay_information_fields_when_passport_is_not_checked":"Kalma günleri: \n\nGünlerle ifade edilen kalma süresi. Bu alan mevcut kalışın giriş ve çıkış tarihleri belirlendikten sonra hesaplanmaktadır.", 
+			  "help_date_text_fields_when_passport_is_checked":"Tarih: \n\nAşağıdaki formatlarda sırasıyla giriş ve çıkış tarihleri: +GÜNAYYIL ve -GÜNAYYIL. Örneğin -+010114 1 Ocak 2014 tarihli pasaporta dair bir giriş mührüne  karşılık gelirken, -010214 1 Şubat 2014 tarihli pasaporta dair bir çıkış mührüne karşılık gelmektedir.", 
+			  "help_reset_button":"Sıfırla tuşu: \n\nBÜTÜN girdileri temizle. Özel kutucuklarda bulunan girdiler klavye kullanılarak tek tek silinebilir. ", 
+			  "messageStartDate_variable":"Yeni' 'Kısa kalış' tanımının yürürlüğe giriş tarihi 18 Ekim 2013 olduğu için, hesaplayıcı 22 Nisan 2013' ten önceki giriş veya kalışlar için kullanılamaz (= 18.10.13 eksi altı ay). Hesaplayıcı 22 Nisan 2013' ten önceki giriş veya kalmaların hesaplanmasını desteklememektedir. Bu türden girişler veya kalışlar 'eski' tanıma tabidir (ilk giriş tarihinden sonraki 6 ayda 3 ay).", 
+			  "settingDate_isValidChar_and_setup_functions":"Geçerli karakterler sadece sayılar ve / işaretidir", 
+			  "settingDate_and_setup_functions_1":"[DATE1] tarihi geçerli bir tarih değildir", 
+			  "settingDate_and_setup_functions_2":"[DATE1] tarihi aşağıdaki formatta olmalıdır: günayyıl veya gün/ay/yıl", 
+			  "cleanForm_function":"Formu silmek istediğinizden emin misiniz? TAMAM yanıtı girilen bütün veriler silecektir.", 
+			  "setup_function":"İlk karakter + veya - olmalıdır", 
+			  "sortCron_function":"Kalışlar kronolojik sırada değildir. Kalışları sıralamak için TAMAM' ı, düzenlemek için İptal'i tıklayın.", 
+			  "report":"Hesaplama sonuçları bu alanda görüntülenecektir.", 
+			  "leggInndager_function_1":"180 günlük dönemde [DATE1] tarihiyle [DATE2] tarihi arası dönemde kalış: [NUMBER3] gün", 
+			  "leggInndager_function_2":" [DATE1] tarihiyle [DATE2] arası dönemde fazladan kalış: ([NUMBER3] gün)", 
+			  "feedback_function_1":"[DATE1] çıkış tarihli kalışın bir giriş tarihi yok", 
+			  "feedback_function_2":"[DATE1] giriş tarihli kalışın bir çıkış tarihi yok", 
+			  "feedback_function_3":"[DATE1] giriş tarihli kalış, [DATE2] tarihli çıkıştan sonra", 
+			  "feedback_function_4":"Çıkış tarihi [DATE1], Giriş/Kontrol tarihi [DATE2]' ten daha sonra", 
+			  "feedback_function_5":"[DATE1] giriş tarihli kalış, evvelki kalışın çıkış tarihinden [DATE2] önce", 
+			  "feedback_function_6":"Kalma süresinin hesaplanması mümkün değil", 
+			  "BeregnVisa_function_1":"90 günlük sürenin başlangıcı: [DATE1]", 
+			  "BeregnVisa_function_2":"180 günlük sürenin başlangıcı: [DATE1]", 
+			  "BeregnVisa_function_3":"Kalmaya en fazla: [NUMBER1] gün izin verilebilir", 
+			  "BeregnVisa_and_BeregnControl_function":"[DATE1] tarihinde bir kalışa [NUMBER2] gün için izin verilebilir", 
+			  "BeregnControl_function_1":"Kayıt döneminde hiçbir fazladan kalma yok.", 
+			  "BeregnControl_function_2":"Kalmaya izin verilmeyebilir.", 
+			  "BeregnControl_function_3":"[DATE1] tarihine kadar olası kalış", 
+			  "BeregnControl_function_4":"Kısa kalış süreli vize sahipleri, vize etiketinde veya VIS' de yer alan gün sayısını kontrol etmeyi unutmamalıdır", 
+			  "disclaimer":"Hesaplayıcı sadece yardımcı bir araçtır;<br/>hesabının sonucundan doğan bir süre<br/>kadar kalma hakkı içermemektedir."
+		   }, 
+		   {
+			  "language":"ru", 
+			  "main_title":"Калькулятор для расчета допустимого срока <br/>пребывания по краткосрочной Шенгенской визе", 
+			  "date_of_entry_control_text_field":"Дата въезда/контроля:", 
+			  "planning_radio_button":"Планирование", 
+			  "control_radio_button":"Контроль ", 
+			  "passport_check_box":"Паспорт", 
+			  "entry_exit_data_columns":"Введите данные предыдущих<br/>пребываний в Шенгенской зоне", 
+			  "cmdCalculate":"Рассчитать", 
+			  "user_guide_link":"Руководство пользователя", 
+			  "cmdReset":"Сброс", 
+			  "help_date_of_entry_control_text_field":"Дата въезда/контроля: \n\nПри открытии программы-калькулятора в этом поле автоматически отображается текущая дата. Дату можно изменить на более раннюю (для проверки соблюдения правила '90 /180 дней' в прошлом) или более позднюю (для проверки максимальной длительности пребывания, допустимой на эту дату). Дата вводится в следующем формате: ДДММГГ и должна быть позднее 22 апреля 2013 г.", 
+			  "help_planning_and_control_radio_button":"Планирование и контроль \n\nПланирование: \nИспользуйте этот режим для проверки максимальной разрешенной продолжительности пребывания на определенную дату в будущем. Эту дату необходимо ввести как дату въезда в графу 'Дата въезда/контроля'. \n\nКонтроль: \nИспользуйте этот режим для расчета продолжительности предыдущих и/или текущего пребываний и проверьте соблюдение правила '90/180 дней' (на контрольную дату).", 
+			  "help_passport_check_box":"Паспорт: \n\nПозволяет вводить даты въезда и выезда в случайной - не хронологической - последовательности.", 
+			  "help_date_of_entry_text_fields_when_passport_is_not_checked":"Дата въезда: \n\nДата/ы въезда, указанные на штампе(-ах) о въезде, поставленном(-ых) уполномоченными органами одного из государств Шенгенского соглашения за последние 180 дней. Периоды пребывания по виду на жительство или по долгосрочной визе (категория «D») не должны учитываться при проведении этого расчета.  Соответственно, даты въезда и выезда (если таковые имеются) по виду на жительство или долгосрочной визе в определенное государство Шенгенского соглашения, вводить не следует.", 
+			  "help_date_of_exit_text_fields_when_passport_is_not_checked":"Дата выезда: \n\nСоответствующая(-ие) дата(-ы) выезда, указанная(-ые) на штампе(-ах) в паспорте.", 
+			  "help_text_for_days_of_stay_information_fields_when_passport_is_not_checked":"Количество дней пребывания: \n\nПродолжительность пребывания в днях. Данные в этой графе рассчитываются после того, как были введены даты въезда и выезда для текущего срока пребывания.", 
+			  "help_date_text_fields_when_passport_is_checked":"Дата: \n\nДаты въезда и выезда соответственно в следующем формате: +ДДММГГ и -ДДММГГ, например, +010114 для штампа о въезде от 01 января 2014 г., -010214 для штампа о выезде от 1 февраля 2014 г.", 
+			  "help_reset_button":"Кнопка сброса: \n\nУдалить ВСЕ данные. Удаление данных из отдельных граф производится с использованием клавиатуры.", 
+			  "messageStartDate_variable":"Новое определение 'краткосрочного периода пребывания' вступает в силу 18 октября 2013 г., поэтому невозможно использование калькулятора для учета дат въезда/пребывания до 22 апреля 2013 г. (=18.10.13 минус шесть месяцев). Калькулятор не поддерживает расчет въездов/пребываний, имевших место до 22 апреля 2013 г. На эти въезды/пребывания распространяется 'старое' определение (3 месяца в течение 6-месячного периода с момента первого въезда).", 
+			  "settingDate_isValidChar_and_setup_functions":"Возможен ввод только цифр и /", 
+			  "settingDate_and_setup_functions_1":"Дата [DATE1] указана неверно", 
+			  "settingDate_and_setup_functions_2":"Дата [DATE1] должна иметь формат ддммгг или дд/мм/гг", 
+			  "cleanForm_function":"Вы уверены, что хотите сбросить все данные? При нажатии кнопки ОК будут удалены все введенные данные.", 
+			  "setup_function":"первым символом должен быть + или -", 
+			  "sortCron_function":"Периоды пребывания указаны не в хронологическом порядке. Нажмите ОК для сортировки или Отмена для редактирования.", 
+			  "report":"Здесь будут отражены результаты расчета.", 
+			  "leggInndager_function_1":"Дней пребывания в течение 180-дневного периода с [DATE1] по [DATE2]: [NUMBER3] дней", 
+			  "leggInndager_function_2":"Превышение разрешенного срока пребывания с [DATE1] по [DATE2] ([NUMBER3] дней)", 
+			  "feedback_function_1":"Не введено даты въезда, соответствующей дате выезда [DATE1]", 
+			  "feedback_function_2":"Не введено даты выезда, соответствующей дате въезда [DATE1]", 
+			  "feedback_function_3":"Пребывание с  датой въезда [DATE1] позднее даты выезда [DATE2]", 
+			  "feedback_function_4":"Дата выезда [DATE1] позднее даты въезда/контроля [DATE2]", 
+			  "feedback_function_5":"Пребывание с датой въезда [DATE2] ранее даты выезда предыдущего пребывания [DATE1]", 
+			  "feedback_function_6":"Невозможно рассчитать срок пребывания", 
+			  "BeregnVisa_function_1":"Начало 90-дневного периода: [DATE1]", 
+			  "BeregnVisa_function_2":"Начало 180-дневного периода: [DATE1]", 
+			  "BeregnVisa_function_3":"Возможный разрешенный срок пребывания - до:  [NUMBER1] дней", 
+			  "BeregnVisa_and_BeregnControl_function":"На [DATE1] разрешенный срок пребывания может составить [NUMBER2] дней", 
+			  "BeregnControl_function_1":"За расчетный период срок пребывания не превышен", 
+			  "BeregnControl_function_2":"Пребывание не разрешено.", 
+			  "BeregnControl_function_3":"Возможный срок пребывания - до  [DATE1]", 
+			  "BeregnControl_function_4":"Обладателям краткосрочных виз необходимо проверить количество дней, указанных на визе или в визовой информационной системе (VIS)", 
+			  "disclaimer":"Калькулятор является лишь<br/>вспомогательным инструментом и не<br/>предоставляет права пребывания на<br/>срок, рассчитанный с его помощью."
+		   }, 
+		   {
+			  "language":"es", 
+			  "main_title":"Calculadora de días de viaje restantes con<br/> un visado de corta duración de Schengen", 
+			  "date_of_entry_control_text_field":"Fecha de entrada/control", 
+			  "planning_radio_button":"Planificación", 
+			  "control_radio_button":"Control", 
+			  "passport_check_box":"Pasaporte", 
+			  "entry_exit_data_columns":"Introducir estancias anteriores<br/>en el espacio Schengen", 
+			  "cmdCalculate":"Calcular", 
+			  "user_guide_link":"Instrucciones de uso", 
+			  "cmdReset":"Reconfigurar", 
+			  "help_date_of_entry_control_text_field":"Fecha de entrada/control: \n\nEsta fecha puede cambiarse por una fecha anterior (para comprobar el cumplimiento de la norma 90/180 días en el pasado) o por una fecha futura (para comprobar la duración máxima de estancia autorizada en un día concreto). La fecha debe introducirse en el siguiente formato: DDMMAA y debe ser posterior al 22 de abril de 2013.", 
+			  "help_planning_and_control_radio_button":"Planificación y control \n\nPlanificación: \nEsta opción sirve para calcular la duración  de estancia máxima permitida en una fecha futura. Esta fecha debe introducirse como fecha de entrada en la casilla 'Fecha de entrada/control'. \n\nControl: \nEsta opción sirve para calcular la duración de estancias anteriores y/o en curso y consultar si se cumple la norma 90/180 días (el día del control).", 
+			  "help_passport_check_box":"Pasaporte: \n\nPermite introducir las fechas de entrada y salida en orden aleatorio (no cronológico).", 
+			  "help_date_of_entry_text_fields_when_passport_is_not_checked":"Fecha de entrada: \n\nSe trata de las fechas de entrada indicadas en los sellos de entrada  estampados por las autoridades de los Estados Schengen en los últimos  180 días. Los periodos de estancia autorizados por un permiso de residencia o un visado de larga duración (visado tipo D) no se tendrán en cuenta al realizar el cálculo. Del mismo modo, tampoco se añadirán las fechas de entrada (si las hubiere) relacionadas con permisos de residencia o visados de larga duración en un determinado Estado Schengen.", 
+			  "help_date_of_exit_text_fields_when_passport_is_not_checked":"Fecha de salida: \n\nFechas de salida correspondientes indicadas en los sellos del pasaporte.", 
+			  "help_text_for_days_of_stay_information_fields_when_passport_is_not_checked":"Días de estancia: \n\nDuración de la estancia en días. Este campo se calcula tras introducir los días de entrada y salida de la estancia en curso.", 
+			  "help_date_text_fields_when_passport_is_checked":"Fecha: \n\nFechas de entrada y salida respectivamente en los siguientes formatos: +DDMMAA y -DDMMAA, p. ej. +010114 equivale a un sello de entrada en el pasaporte de 1 de enero de 2014, y -010214 equivale a un sello de salida de 1 de febrero de 2014.", 
+			  "help_reset_button":"Botón de reconfiguración: \n\nBorra TODAS las entradas. Las entradas de las distintas casillas pueden borrarse individualmente utilizando el teclado.", 
+			  "messageStartDate_variable":"La nueva definición de «estancia de corta duración» entró en vigor el 18 de octubre de 2013 y, por tanto, la calculadora no puede usarse para entradas o estancias anteriores al 22 de  abril de 2013 (= 18.10.13 menos seis meses). La calculadora no permite calcular entradas o estancias anteriores al 22 de abril de 2013, a las que se aplica la antigua definición («3 meses en un periodo de 6 months desde la fecha de la primera entrada).", 
+			  "settingDate_isValidChar_and_setup_functions":"Los únicos caracteres válidos son los números y la barra («/»).", 
+			  "settingDate_and_setup_functions_1":"La fecha [DATE1] no es válida.", 
+			  "settingDate_and_setup_functions_2":"La fecha [DATE1] debe estar en el formato siguiente: ddmmaa o dd/mm/aa", 
+			  "cleanForm_function":"¿Seguro que desea usted reconfigurar? Si responde afirmativamente, borrará los datos introducidos.", 
+			  "setup_function":"El primer carácter debe ser «+» o «-».", 
+			  "sortCron_function":"Las estancias no están en orden cronológico. Pulse OK para ordenar las estancias y Cancel para modificar las estancias.", 
+			  "report":"En este espacio aparecerán los resultados del cálculo.", 
+			  "leggInndager_function_1":"Días de estancia en el periodo de 180 días comprendido entre el [DATE1] y el [DATE2]: [NUMBER3] día(s).", 
+			  "leggInndager_function_2":"Se rebasa durante el periodo del [DATE1] al [DATE2] ([NUMBER3] día(s).", 
+			  "feedback_function_1":"La estancia con fecha de salida [DATE1] no tiene fecha de entrada.", 
+			  "feedback_function_2":"La estancia con fecha de entrada [DATE1] no tiene fecha de salida.", 
+			  "feedback_function_3":"La fecha de entrada [DATE1] es posterior a la fecha de salida [DATE2].", 
+			  "feedback_function_4":"La fecha de salida [DATE1] es posterior a la fecha de entrada/control [DATE2].", 
+			  "feedback_function_5":"La estancia con fecha de entrada [DATE1] es anterior a la fecha de salida de la estancia anterior [DATE2].", 
+			  "feedback_function_6":"No es posible calcular la estancia.", 
+			  "BeregnVisa_function_1":"Inicio del periodo de 90 días: [DATE1] ", 
+			  "BeregnVisa_function_2":"Inicio del periodo de 180 días: [DATE1] ", 
+			  "BeregnVisa_function_3":"Puede autorizarse una estancia de hasta [NUMBER1] día(s).", 
+			  "BeregnVisa_and_BeregnControl_function":"En la fecha [DATE1] puede autorizarse una estancia de [NUMBER2] día(s).", 
+			  "BeregnControl_function_1":"No se ha rebasado la estancia autorizada en el periodo registrado.", 
+			  "BeregnControl_function_2":"No puede autorizarse estancia alguna.", 
+			  "BeregnControl_function_3":"Estancia posible hasta el [DATE1].", 
+			  "BeregnControl_function_4":"Los titulares de visados de corta duración deben recordar comprobar el número de días indicado en la etiqueta del visado o en el VIS.", 
+			  "disclaimer":"La calculadora es solo una herramienta<br/>de ayuda; no da un derecho de estancia<br/>durante el período que resulte de su uso."
+		   }
+		];
+
+		/*	function tag:
+				- accepts:
+					1) a text string (tag_text) containing variable data identifiers (eg. [DATE1])
+					2) an array (data) containing variable data
+				- returns
+					1) a string where the variable data identifiers are replaced by the values of the elements of (data) in order of appearence. */
+		function tag(tag_text, data) {
+			var local_tag = tag_text;
+			var data_i=0; // Pointer to first element in the array
+			var regex = /\[[A-Z0-9]*\]/; // Regular expression to match an open square brackets "\[" followed by any sequence of upercase alfanumeric string "[A-Z0-9]*" and followed by a closing square bracket "\]"
+			var match = regex.exec(local_tag); // Match the regular expression and return first match in an one element array
+			while (match != null) {
+				local_tag = local_tag.replace(match[0], data[data_i]); // Since there was a match, replace the data identifier with the corresponding variable data
+				data_i++; // Move index to next varaiable data
+				match = regex.exec(local_tag); // Find next variable data identifier
+			}
+			return local_tag;
+		}
+	
+		var translation;
+
+		$(document).ready(function() {
+		
+			language = $.url().param('lang'); // retrieve language from URL
+			
+			if ((typeof language === 'undefined') || ($.inArray(language , ["en", "es", "fr", "tr", "ru"]) == -1)) { // Language is not defined in URL or is empty
+				language = "en"; // set it to default: English
+			}
+			
+			$.each(translations, function(i, t) { // Retrieve tags for the selected language 
+				if (t.language == language) {
+					translation = t;
+				}
+			});
+
+			$("#infoTxtField").click(function() {
+				alert(translation.help_date_of_entry_control_text_field);
+			});
+			$("#infoPlanningControl").click(function() {
+				alert(translation.help_planning_and_control_radio_button);
+			});
+			$("#infoPassport").click(function() {
+				alert(translation.help_passport_check_box);
+			});
+			$("#infoPassportInput").click(function() {
+				alert(translation.help_date_text_fields_when_passport_is_checked);
+			});
+			$("#infoStaysEntryInput").click(function() {
+				alert(translation.help_date_of_entry_text_fields_when_passport_is_not_checked);
+			});
+			$("#infoStaysExitInput").click(function() {
+				alert(translation.help_date_of_exit_text_fields_when_passport_is_not_checked);
+			});
+			$("#infoStaysDays").click(function() {
+				alert(translation.help_text_for_days_of_stay_information_fields_when_passport_is_not_checked);
+			});
+			$("#infoReset").click(function() {
+				alert(translation.help_reset_button);
+			});
+			$('#cmdPassport').attr('checked', false);
+			$("#cmdPassport").change(function() {
+				fncPassport();
+			});
+			
+			$("#main_title").html(translation.main_title);
+			$("#date_of_entry_control_text_field").text(translation.date_of_entry_control_text_field);
+			$("#planning_radio_button").html(translation.planning_radio_button);
+			$("#control_radio_button").html(translation.control_radio_button);
+			$("#passport_check_box").html(translation.passport_check_box);
+			$("#entry_exit_data_columns").html(translation.entry_exit_data_columns);
+			$("#cmdCalculate").attr("value", translation.cmdCalculate);
+			$("#report").html(translation.report);
+			$("#user_guide_link").html(translation.user_guide_link);
+			$("#user_guide_link_a").attr("href", "docs/short_stay_schengen_calculator_user_manual_en.pdf");
+			user_guide_link_length = parseInt($("#user_guide_link").css("width"));
+			$("#user_guide").css("left", 624 - (user_guide_link_length == 0 ? 90 : user_guide_link_length));
+			$("#cmdReset").attr("value", translation.cmdReset);
+			$("#disclaimer").html(translation.disclaimer);
+		});
+	</script>
+			
+<script language="JavaScript">
+<!--
+  window.a = "";
+  var Dateberegningsdato;
+  var DateControl;
+  var antallrader = 50;
+  var rows;
+  var fraDato = new Array();
+  var tilDato = new Array();
+  var TxtPassport = new Array();
+  var dager = new Array();
+  var hist = new Array();
+  var histdager = new Array();
+  var modeCronology = true;
+  
+   function append(str) {
+      append(s, "BLACK");
+   }
+
+   function append(str, fstr) {
+      var x = document.getElementById("report");
+      var newDiv = document.createElement("div");
+      switch (fstr) {
+      case 'green':
+          newDiv.innerHTML = "<div style=color:green>" + str + "</div>\n";
+          break;
+      case 'red':
+          newDiv.innerHTML = "<div style=color:red>" + str + "</div>\n";
+          break;
+      case 'black':
+          newDiv.innerHTML = "<div style=color:green>" + str + "</div>\n";
+          break;
+      default:
+          newDiv.innerHTML = "<div style=color:black>" + str + "</div>\n";
+      }
+      x.appendChild(newDiv);
+  }
+
+  function settingDate(t) {
+      var x = document.getElementById('TxtField');
+      var str = x.value;
+              var i = 0;
+              var isValidChar = true;
+              while (i < str.length) {
+                  switch (str.charAt(i)) {
+                  case '0':
+                  case '1':
+                  case '2':
+                  case '3':
+                  case '4':
+                  case '5':
+                  case '6':
+                  case '7':
+                  case '8':
+                  case '9':
+                  case '/':
+                      break;
+                  default:
+                      isValidChar = false;
+                      alert(translation.settingDate_isValidChar_and_setup_functions);
+                      str = "";
+                  }
+                  i++;
+              }
+			  
+              if (isValidChar) {
+                  if (str.charAt(2) != "/" && str.length > 2) str = str.substr(0, 2) + "/" + str.substr(2, 6);
+                  if (str.charAt(5) != "/" && str.length > 5) str = str.substr(0, 5) + "/" + str.substr(5, 6);
+              }
+              if (str.length ==8) {
+                  if (str != DateToString(StringToDate(str))) {
+                      alert(tag(translation.settingDate_and_setup_functions_1, [str]));
+                      str="";
+                  }
+		
+              }
+              else {
+			     alert(tag(translation.settingDate_and_setup_functions_2, [str]));
+			  }
+
+      x.value = str;
+  }
+
+  function cleanReport() {
+      var x = document.getElementById('report');
+      x.innerHTML = '';
+      return false;
+  }
+
+   function cleanForm() {
+      if (confirm(translation.cleanForm_function)) {
+
+         document.getElementById('TxtField').value = DateToString(new Date());
+         cleanReport();
+         fraDato = new Array();
+         tilDato = new Array();
+
+         for (var i = 0; i < antallrader; i++) {
+            var x = document.getElementById("fra" + i);
+            x.value = '';
+            var x = document.getElementById("til" + i);
+            x.value = '';
+            var x = document.getElementById("dager" + i);
+            x.value = '';
+         }
+
+         for (var i = 0; i < antallrader * 2; i++) {
+            var x = document.getElementById("TxtPassport" + i);
+            x.value = '';
+         }
+      }
+  }
+
+  function cleanMain() {
+      cleanReport();
+      fraDato = new Array();
+      tilDato = new Array();
+
+      for (var i = 0; i < antallrader; i++) {
+          var x = document.getElementById("fra" + i);
+          x.value = '';
+          var x = document.getElementById("til" + i);
+          x.value = '';
+          var x = document.getElementById("dager" + i);
+          x.value = '';
+      }
+  }
+
+  function isValidDate(sjekkdato) {
+      if (sjekkdato == "" || isNaN(sjekkdato)) {
+          return false;
+      } else {
+          return true;
+      }
+
+  }
+
+  function isValidChar(c) {
+      isValidChar = true;
+      switch (c) {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case '/':
+          break;
+      default:
+          isValidChar = false;
+          alert(translation.settingDate_isValidChar_and_setup_functions);
+      }
+
+      return isValidChar;
+  }
+
+  function DateToString(dato) {
+      var txt;
+      var dd = dato.getDate();
+      var mm = dato.getMonth() + 1;
+      var yyyy = dato.getFullYear();
+      if (parseInt(dd) < 10) {
+          dd = '0' + dd
+      }
+      if (parseInt(mm) < 10) {
+          mm = '0' + mm
+      }
+      txt = "" + dd + "/" + mm + "/" + yyyy % 100;
+
+      return txt;
+  }
+
+  function StringToDate(str) {
+      var dd = str.substring(0, 2);
+      var mm = str.substring(3, 5);
+      var yyyy = "20" + str.substring(6, 10);
+      var tt = "06";
+
+      var d = new Date(yyyy, mm - 1, dd, tt);
+      return d;
+  }
+
+  function DagerSiden(dato, dager) {
+      var timestamp;
+      timestamp = dato.getTime() - (1000 * 60 * 60 * 24 * dager);
+      var newDate = new Date(timestamp);
+      return newDate;
+  }
+
+  function daysBetween(fra, til) {
+      var dager;
+      if (fra == null || til == null) return -1;
+      if (til.getTime() + (1000 * 60 * 60 * 2) < fra.getTime()) {
+          dager = -1;
+      } else {
+          dager = (til.getTime() + (1000 * 60 * 60 * 2) - fra.getTime()) / (1000 * 60 * 60 * 24);
+          dager++;
+      }
+      return Math.floor(dager);
+  }
+
+
+  function setup() {
+      var fra = new Array();
+      var til = new Array();
+      var tabid = 1;
+
+ 
+
+
+      for (var i = 0; i < antallrader; i++) {
+          fra[i] = document.createElement("input");
+          fra[i].setAttribute("type", "text");
+          fra[i].setAttribute("name", "text" + i);
+          fra[i].setAttribute("tabindex", tabid);
+          fra[i].setAttribute("id", "fra" + i);
+
+
+          fra[i].style.width = 60;
+          fra[i].style.margin = 2;
+          fra[i].onchange = function () {
+              var str = this.value;
+              var i = 0;
+              var isValidChar = true;
+              while (i < str.length) {
+                  switch (str.charAt(i)) {
+                  case '0':
+                  case '1':
+                  case '2':
+                  case '3':
+                  case '4':
+                  case '5':
+                  case '6':
+                  case '7':
+                  case '8':
+                  case '9':
+                  case '/':
+                      break;
+                  default:
+                      isValidChar = false;
+                      alert(translation.settingDate_isValidChar_and_setup_functions);
+                      str = "";
+                  }
+                  i++;
+              }
+              if (isValidChar) {
+                  if (str.charAt(2) != "/" && str.length > 2) str = str.substr(0, 2) + "/" + str.substr(2, 6);
+                  if (str.charAt(5) != "/" && str.length > 5) str = str.substr(0, 5) + "/" + str.substr(5, 6);
+				  
+              }
+
+              if (str.length ==8) {
+                  if (str != DateToString(StringToDate(str))) {
+                      alert(tag(translation.settingDate_and_setup_functions_1, [str]));
+                      str="";
+                  }
+				  if(daysBetween( StringToDate('22/04/13'), StringToDate(str))<0) {
+				  alert(translation.messageStartDate_variable);
+				  str="";}
+                  
+              }
+              else {
+			     alert(tag(translation.settingDate_and_setup_functions_2, [str]));
+			  }
+              this.value = str;
+          }
+          var foo = document.getElementById("stays");
+          foo.appendChild(fra[i]);
+          tabid++;
+
+          til[i] = document.createElement("input");
+          til[i].setAttribute("type", "text");
+          til[i].setAttribute("name", "text" + i);
+          til[i].setAttribute("tabindex", tabid);
+          til[i].setAttribute("id", "til" + i);
+          til[i].style.width = 60;
+          til[i].style.margin = 2;
+          til[i].onchange = function () {
+              var str = this.value;
+              var i = 0;
+              var isValidChar = true;
+              while (i < str.length) {
+                  switch (str.charAt(i)) {
+                  case '0':
+                  case '1':
+                  case '2':
+                  case '3':
+                  case '4':
+                  case '5':
+                  case '6':
+                  case '7':
+                  case '8':
+                  case '9':
+                  case '/':
+                      break;
+                  default:
+                      isValidChar = false;
+                      alert(translation.settingDate_isValidChar_and_setup_functions);
+                      str = "";
+                  }
+                  i++;
+              }
+              if (isValidChar) {
+                  if (str.charAt(2) != "/" && str.length > 2) str = str.substr(0, 2) + "/" + str.substr(2, 6);
+                  if (str.charAt(5) != "/" && str.length > 5) str = str.substr(0, 5) + "/" + str.substr(5, 6);
+              }
+              if (str.length ==8) {
+                  if (str != DateToString(StringToDate(str))) {
+                      alert(tag(translation.settingDate_and_setup_functions_1, [str]));
+                      str="";
+                  }
+				  if(daysBetween( StringToDate('22/04/13'), StringToDate(str))<0) {
+				     alert(translation.messageStartDate_variable);
+				     str="";
+				  }
+              }
+              else 
+			  {
+				alert(tag(translation.settingDate_and_setup_functions_2, [str]));
+			  }
+
+
+              this.value = str;
+          }
+          var foo = document.getElementById("stays");
+          foo.appendChild(til[i]);
+          tabid++;
+
+          dager[i] = document.createElement("input");
+          dager[i].setAttribute("type", "text");
+          dager[i].setAttribute("name", "dager" + i);
+          dager[i].disabled=true;
+
+          dager[i].setAttribute("id", "dager" + i);
+          dager[i].style.width = 30;
+          dager[i].style.margin = 2;
+          var foo = document.getElementById("stays");
+          foo.appendChild(dager[i]);
+
+          var br = document.createElement("br");
+          var foo = document.getElementById("stays");
+          foo.appendChild(br);
+          document.getElementById('TxtField').value = DateToString(new Date());
+
+      }
+
+      for (var i = 0; i < antallrader * 2; i++) {
+          TxtPassport[i] = document.createElement("input");
+          TxtPassport[i].setAttribute("type", "text");
+          TxtPassport[i].setAttribute("name", "TxtPassport" + i);
+          TxtPassport[i].setAttribute("tabindex", tabid);
+          TxtPassport[i].setAttribute("id", "TxtPassport" + i);
+          TxtPassport[i].style.width = 70;
+          TxtPassport[i].style.margin = 2;
+          TxtPassport[i].onchange = function () {
+              var str = this.value;
+              var i = 1;
+              var firstchar;
+              if (str.charAt(0) != "+" && str.charAt(0) != "-" && str.length > 0) {
+                  alert(translation.setup_function);
+                  str = "";
+              } else {
+                  while (i < str.length) {
+                      switch (str.charAt(i)) {
+                      case '0':
+                      case '1':
+                      case '2':
+                      case '3':
+                      case '4':
+                      case '5':
+                      case '6':
+                      case '7':
+                      case '8':
+                      case '9':
+                      case '/':
+                          break;
+                      default:
+                          isValidChar = false;
+                          alert(translation.settingDate_isValidChar_and_setup_functions);
+                          str = "";
+                      }
+                      i++;
+                  }
+                  if (isValidChar) {
+                  if (str.charAt(3) != "/" && str.length > 3) str = str.substr(0, 3) + "/" + str.substr(3, 7);
+                  if (str.charAt(6) != "/" && str.length > 6) str = str.substr(0, 6) + "/" + str.substr(6, 8);
+					}
+                 
+              }
+              this.value = str;
+          }
+
+
+
+
+
+          var foo = document.getElementById("passportstays");
+          foo.appendChild(TxtPassport[i]);
+
+          var br = document.createElement("br");
+          var foo = document.getElementById("passportstays");
+          foo.appendChild(br);
+          tabid++;
+      }
+      document.getElementById("passportstays").style.visibility = "hidden";
+  }
+
+  function fncCalculate() {
+      cleanReport();
+
+      var x = document.getElementById("report");
+      window.a = "";
+
+      if (!modeCronology) {
+          cleanMain();
+          InsertDates();
+          sjekkdatoer();
+          sortPassport();
+          ordneDatoer();
+          fncPassport();
+      }
+      sjekkdatoer();
+	  if(sortCron())  cleanReport();sjekkdatoer();
+      if (feedback()) {
+          if (leggInndager()) {
+              if (document.getElementById('altVisa').checked) {
+                  BeregnVisa();
+              } else {
+                  BeregnControl();
+              }
+          }
+      }
+	$('#cmdPassport').attr('checked', false);
+
+  }
+
+  function fncPassport() {
+      if (modeCronology) {
+	      document.getElementById("spanInfoStaysEntryInput").style.visibility = "hidden";
+	      document.getElementById("spanInfoStaysExitInput").style.visibility = "hidden";
+	      document.getElementById("spanInfoStaysDays").style.visibility = "hidden";
+          document.getElementById("stays").style.visibility = "hidden";
+		  
+		  document.getElementById("spanInfoPassportInput").style.visibility = "visible";
+          document.getElementById("passportstays").style.visibility = "visible";
+          modeCronology = false;
+      } else {
+	      document.getElementById("spanInfoStaysEntryInput").style.visibility = "visible";
+	      document.getElementById("spanInfoStaysExitInput").style.visibility = "visible";
+	      document.getElementById("spanInfoStaysDays").style.visibility = "visible";
+          document.getElementById("stays").style.visibility = "visible";
+
+		  document.getElementById("spanInfoPassportInput").style.visibility = "hidden";
+          document.getElementById("passportstays").style.visibility = "hidden";
+          modeCronology = true;
+      }
+  }
+
+  function InsertDates() {
+      var i = 0;
+      var str;
+      var inn = 0;
+      var ut = 0;
+
+      while (i < antallrader * 2) { //
+          x = document.getElementById("TxtPassport" + i);
+          str = x.value;
+          x.value.charAt(2)
+
+          if (x.value.charAt(0) == '+') {
+              fraDato[inn] = StringToDate(x.value);
+              z = document.getElementById("fra" + inn);
+              z.value = x.value.substr(1, 10);
+              inn++;
+          }
+          if (x.value.charAt(0) == '-') {
+              tilDato[ut] = StringToDate(x.value);
+              z = document.getElementById("til" + ut);
+              z.value = x.value.substr(1, 10);
+              ut++;
+          }
+          i++;
+
+      }
+  }
+
+  function sjekkdatoer() {
+      var x; //=document.getElementById("fra"+2);
+      var i = 0;
+      validRows = 0;
+
+      Dateberegningsdato = StringToDate(document.getElementById('TxtField').value);
+      DateControl = StringToDate(document.getElementById('TxtField').value);
+
+      while (i < antallrader) {
+
+          x = document.getElementById("fra" + i);
+          y = document.getElementById("til" + i);
+          z = document.getElementById("dager" + i);
+          if (x.value != "") {
+
+              fraDato[i] = StringToDate(document.getElementById('fra' + i).value);
+          }
+          if (y.value != "") {
+              tilDato[i] = StringToDate(y.value);
+          }
+
+          if (x.value != "" && y.value != "") {
+              z.value = daysBetween(fraDato[i], tilDato[i]);
+              validRows++;
+          }
+          i++;
+      }
+
+  }
+
+  function sortPassport() {
+      var isSorted = false;
+      var x;
+      var y;
+      var i = 1;
+      var tmpDate;
+
+      while (!isSorted) {
+          isSorted = true;
+          i = 1;
+          while (i < antallrader && !isNaN(fraDato[i])) {
+              if (daysBetween(fraDato[i - 1], fraDato[i]) < 0) {
+                  tmpDate = fraDato[i - 1];
+                  fraDato[i - 1] = fraDato[i];
+                  fraDato[i] = tmpDate;
+                  isSorted = false;
+              }
+              i++;
+          }
+      }
+      isSorted = false;
+
+      while (!isSorted) {
+          isSorted = true;
+          i = 1;
+          while (i < antallrader & !isNaN(tilDato[i])) {
+              if (daysBetween(tilDato[i - 1], tilDato[i]) < 0) {
+                  tmpDate = tilDato[i - 1];
+                  tilDato[i - 1] = tilDato[i];
+                  tilDato[i] = tmpDate;
+                  isSorted = false;
+              }
+              i++;
+          }
+      }
+      i = 0;
+
+  }
+
+  function ordneDatoer() {
+      i = 0;
+
+      while (i < Math.max(fraDato.length, tilDato.length)) {
+          if (i + 1 < fraDato.length && i < tilDato.length && tilDato[i] != "" && fraDato[i + 1] != "") {
+              if (daysBetween(tilDato[i], fraDato[i + 1]) < 0) {
+                  tilDato.splice(i, 0, "");
+              }
+          }
+          if (i < fraDato.length && i < tilDato.length && fraDato[i] != "" && tilDato[i] != "") {
+              if (daysBetween(fraDato[i], tilDato[i]) < 0) {
+                  fraDato.splice(i, 0, "");
+              }
+          }
+          i++;
+      }
+
+      i = 0;
+      while (i < fraDato.length) {
+          var x = document.getElementById("fra" + i);
+          if (fraDato[i] == "") {
+              x.value = "";
+          } else {
+              x.value = DateToString(fraDato[i]);
+          }
+          i++;
+      }
+      i = 0;
+      while (i < tilDato.length) {
+          var x = document.getElementById("til" + i);
+          if (tilDato[i] == "") {
+              x.value = "";
+          } else {
+              x.value = DateToString(tilDato[i]);
+          }
+          i++;
+      }
+  }
+  function sortCron() {
+      var isSorted = false;
+      var x;
+      var y;
+      var i = 1;
+      var tmpDate;
+	  skalSorteres=false;
+			
+   
+           while (i < fraDato.length && !skalSorteres) {
+            if (daysBetween(fraDato[i - 1], fraDato[i]) > 1||(daysBetween(fraDato[i - 1], fraDato[i]) ==1 && daysBetween(tilDato[i - 1], tilDato[i])>0)||isNaN(fraDato[i])) {i++;}
+              else{
+                  skalSorteres=confirm(translation.sortCron_function);
+              }
+         }
+  
+	  
+	  while (!isSorted&&skalSorteres) {
+          isSorted = true;
+          i = 1;
+          while (i < fraDato.length) {
+            if (daysBetween(fraDato[i - 1], fraDato[i]) > 1||(daysBetween(fraDato[i - 1], fraDato[i]) ==1 && daysBetween(tilDato[i - 1], tilDato[i])>0)||isNaN(fraDato[i])) {}
+              else{
+                  tmpDate = fraDato[i - 1];
+                  fraDato[i - 1] = fraDato[i];
+                  fraDato[i] = tmpDate;
+                  tmpDate = tilDato[i - 1];
+                  tilDato[i - 1] = tilDato[i];
+                  tilDato[i] = tmpDate;
+                  isSorted = false;
+              }
+              i++;
+          }
+      }
+      i = 0;
+      while (i < fraDato.length&&skalSorteres) {
+          var x = document.getElementById("fra" + i);
+          var y = document.getElementById("til" + i);
+		  var z = document.getElementById("dager" + i);
+          if (isNaN(fraDato[i]) == true) {
+              x.value = "";
+		  } else {
+              x.value = DateToString(fraDato[i]);
+          }
+          if (isNaN(tilDato[i]) == true) {
+              y.value = "";
+          } else {
+              y.value = DateToString(tilDato[i]);
+          }
+		  z.value="";
+          i++;
+      }
+	  return skalSorteres;
+	  }
+
+
+  function leggInndager() {
+      var i = 0;
+      var totalt = 0;
+      var diffDager;
+      var lovligOppholdRad = true;
+      var lovligOpphold = true;
+      var row = 0;
+      rows = daysBetween(fraDato[0], DateControl) + 180;
+      x = document.getElementById("fra" + 0);
+      var d = StringToDate(x.value);
+
+      while (i < rows) {
+		  if( daysBetween(d, tilDato[row])==1 && daysBetween(fraDato[row+1], d)==1)
+		  {
+             row++;
+		  }
+
+          if (daysBetween(fraDato[row], d) > 0 && daysBetween(d, tilDato[row]) > 0) {
+              hist[i] = 1;
+          } else if (daysBetween(DateControl, d) >= 1) {
+              hist[i] = 1;
+          } else {
+              hist[i] = 0;
+          }
+ 
+          if (daysBetween(d, tilDato[row]) <= 1) {
+              row++;
+          }
+          d = DagerSiden(d, -1);
+          i++;
+      }
+	  
+      i = 0;
+      while (i < rows) {
+          if (i == 0) {
+              histdager[i] = 1;
+          } else if (i < 180) {
+              histdager[i] = histdager[i - 1] + hist[i];
+          } else {
+              histdager[i] = histdager[i - 1] + hist[i] - hist[i - 180];
+          }
+          i++;
+      }
+
+      i = 0;
+      row = 0;
+
+      while (row < validRows) {
+          i = daysBetween(fraDato[0], fraDato[row]) - 1;
+          while (i <= (daysBetween(fraDato[0], tilDato[row]) - 1) && lovligOppholdRad) {
+              if (histdager[i] > 90) {
+                  lovligOppholdRad = false;
+                  append(tag(translation.leggInndager_function_1, [DateToString(DagerSiden(tilDato[row], 179)), DateToString(tilDato[row]), histdager[daysBetween(fraDato[0], tilDato[row]) - 1]]), "red");
+                  append(tag(translation.leggInndager_function_2, [DateToString(DagerSiden(fraDato[0], -i)), DateToString(tilDato[row]), daysBetween(DagerSiden(fraDato[0], -i), tilDato[row])]), "red");
+
+                  lovligOpphold = false;
+              }
+              i++;
+          }
+          row++;
+          lovligOppholdRad = true;
+      }
+      return lovligOpphold;
+      return true;
+  }
+
+  function feedback() {
+      var returverdi = true;
+      var i = 0;
+      var x;
+      var y;
+      var z;
+
+      while (isValidDate(fraDato[i]) || isValidDate(tilDato[i])) {
+			if(daysBetween(StringToDate('22/04/13'), fraDato[i])<0) {
+				  alert(translation.messageStartDate_variable);returverdi = (returverdi && false);}
+			if(daysBetween(StringToDate('22/04/13'), tilDato[i])<0) {
+				  alert(translation.messageStartDate_variable);returverdi = (returverdi && false);}
+	  
+
+          x = document.getElementById("fra" + i);
+          y = document.getElementById("til" + i);
+          if (!isValidDate(fraDato[i])) {
+              append(tag(translation.feedback_function_1, [y.value]));
+              returverdi = (returverdi && false);
+          }
+
+          if (!isValidDate(tilDato[i])) {
+              append(tag(translation.feedback_function_2, [x.value]));
+              returverdi = (returverdi && false);
+          }
+
+          if (isValidDate(fraDato[i]) && isValidDate(tilDato[i])) {
+              if (daysBetween(fraDato[i], tilDato[i]) < 0) {
+                  append(tag(translation.feedback_function_3, [x.value, y.value]));
+                  returverdi = (returverdi && false);
+              }
+          }
+
+          if (isValidDate(tilDato[i])) {
+              if (daysBetween(tilDato[i], DateControl) < 0) {
+                  append(tag(translation.feedback_function_4, [y.value, document.getElementById('TxtField').value]));
+                  returverdi = (returverdi && false);
+              }
+          }
+
+          if (i > 0) {
+              if (isValidDate(fraDato[i + 1]) && isValidDate(tilDato[i])) {
+                  if (daysBetween(tilDato[i], fraDato[i + 1]) < 0) {
+                      z = document.getElementById("fra" + (i + 1));
+                      append(tag(translation.feedback_function_5, [z.value, y.value]));
+                      returverdi = (returverdi && false);
+                  }
+              }
+          }
+          i++;
+      } //end while                                                                                                                                                 
+      if (returverdi == false) append(translation.feedback_function_6 + "\n");
+      return returverdi;
+  }
+
+  function BeregnVisa() {
+      var visumkangisdager = 0;
+      var Dateberegningsdato = StringToDate(document.getElementById('TxtField').value);
+      var tekst;
+      var x = document.getElementById("til" + (validRows - 1));
+      var y = document.getElementById("TxtField");
+
+      append(tag(translation.BeregnVisa_function_1, [DateToString(DagerSiden(Dateberegningsdato, 89))]));
+      append(tag(translation.BeregnVisa_function_2, [DateToString(DagerSiden(Dateberegningsdato, 179))]));
+
+      visumkangisdager = Beregn2(Dateberegningsdato);
+      if (visumkangisdager == 0) {
+          append(tag(translation.BeregnVisa_function_3, [visumkangisdager]));
+      } else if (visumkangisdager > 0) {
+          append(tag(translation.BeregnVisa_function_3, [visumkangisdager]), "green");
+
+      }
+      if (visumkangisdager == 0) {
+          if (x.value == y.value) {
+              Dateberegningsdato = DagerSiden(Dateberegningsdato, -1);
+          }
+          Dateberegningsdato = Beregn3(Dateberegningsdato);
+          visumkangisdager = Beregn2(Dateberegningsdato);
+          append(tag(translation.BeregnVisa_and_BeregnControl_function, [DateToString(Dateberegningsdato), visumkangisdager]), "BLACK");
+      }
+
+  }
+
+  function BeregnControl() {
+      var Dateberegningsdato;
+      var visumkangisdager = 0;
+      var Dateberegningsdato = StringToDate(document.getElementById('TxtField').value);
+      append(translation.BeregnControl_function_1);
+
+      visumkangisdager = Beregn2(Dateberegningsdato);
+
+      if (visumkangisdager == 0) {
+          if (DateToString(tilDato[validRows - 1]) == DateToString(DateControl)) {
+              append(tag(translation.BeregnVisa_and_BeregnControl_function, [DateToString(Dateberegningsdato), visumkangisdager]), "BLACK");
+          } else {
+              append(translation.BeregnControl_function_2, "RED");
+          }
+      } else if (visumkangisdager > 0) {
+          if (validRows != 0) {
+              if (DateToString(tilDato[validRows - 1]) == DateToString(DateControl)) visumkangisdager++;
+          }
+          append(tag(translation.BeregnControl_function_3, [DateToString(DagerSiden(DateControl, -visumkangisdager + 1))]), "GREEN");
+          append(translation.BeregnControl_function_4, "green");
+      }
+
+      if (visumkangisdager == 0) {
+          if (DateToString(tilDato[validRows - 1]) == DateToString(DateControl)) {
+              Dateberegningsdato = DagerSiden(Dateberegningsdato, -1);
+          }
+
+          Dateberegningsdato = Beregn3(Dateberegningsdato);
+          visumkangisdager = Beregn2(Dateberegningsdato);
+          append(tag(translation.BeregnVisa_and_BeregnControl_function, [DateToString(Dateberegningsdato), visumkangisdager]), "BLACK");
+      }
+  }
+
+  function Beregn2(dato) {
+      var d;
+      var i;
+      var totalt = 0;
+      var visumKanGisDager = 0;
+      if (validRows == 0) {
+          visumKanGisDager = 90;
+      } else {
+          i = daysBetween(fraDato[0], dato) - 1;
+          while (histdager[i] <= 90 && i < rows) {
+              visumKanGisDager++;
+              i++;
+          }
+          i = daysBetween(fraDato[0], dato) - 1;
+
+          if (DateToString(tilDato[validRows - 1]) == DateToString(dato)) {
+              visumKanGisDager=visumKanGisDager-1;
+          }
+      }
+      return visumKanGisDager;
+  }
+
+  function Beregn3(d) {
+      i = daysBetween(fraDato[0], d) - 1;
+      hist[i] = 1;
+      if (i < 180) {
+          histdager[i] = histdager[i - 1] + hist[i];
+      } else {
+          histdager[i] = histdager[i - 1] + hist[i] - hist[i - 180];
+      }
+
+      while (histdager[i] > 90) {
+          hist[i] = 0;
+          if (i < 180) {
+              histdager[i] = histdager[i - 1] + hist[i];
+          } //variant ikke mulig
+          else {
+              histdager[i] = histdager[i - 1] + hist[i] - hist[i - 180];
+          }
+          i++;
+          d = DagerSiden(d, -1);
+          hist[i] = 1;
+          if (i < 180) {
+              histdager[i] = histdager[i - 1] + hist[i];
+          } else {
+              histdager[i] = histdager[i - 1] + hist[i] - hist[i - 180];
+          }
+      }
+      while (i < rows - 1) {
+          i++;
+          hist[i] = 1;
+          if (i < 180) {
+              histdager[i] = histdager[i - 1] + hist[i];
+          } else {
+              histdager[i] = histdager[i - 1] + hist[i] - hist[i - 180];
+          }
+      }
+      return d;
+  }
+
+
+  function example(val) {
+
+      cleanForm();
+      switch (val) {
+      case 'Ex. KOM 1.1':
+          document.getElementById('fra0').value = '27/10/13';
+          document.getElementById('til0').value = '06/11/13';
+          document.getElementById('fra1').value = '28/12/13';
+          document.getElementById('til1').value = '09/01/14';
+          document.getElementById('fra2').value = '06/03/14';
+          document.getElementById('til2').value = '15/03/14';
+          document.getElementById('TxtField').value = '15/03/14';
+          break;
+
+      case 'Ex. KOM 1.2':
+          document.getElementById('fra0').value = '27/10/13';
+          document.getElementById('til0').value = '06/11/13';
+          document.getElementById('fra1').value = '28/12/13';
+          document.getElementById('til1').value = '09/01/14';
+          document.getElementById('fra2').value = '06/03/14';
+          document.getElementById('til2').value = '10/05/14';
+          document.getElementById('TxtField').value = '10/05/14';
+          break;
+      case 'Ex. KOM 1.3':
+          document.getElementById('fra0').value = '27/10/13';
+          document.getElementById('til0').value = '06/11/13';
+          document.getElementById('fra1').value = '28/12/13';
+          document.getElementById('til1').value = '09/01/14';
+          document.getElementById('fra2').value = '06/03/14';
+          document.getElementById('til2').value = '21/05/14';
+          document.getElementById('TxtField').value = '21/05/14';
+          break;
+      case 'Ex. KOM 1.4':
+          document.getElementById('fra0').value = '27/10/12';
+          document.getElementById('til0').value = '06/11/12';
+          document.getElementById('fra1').value = '28/12/12';
+          document.getElementById('til1').value = '09/01/13';
+          document.getElementById('fra2').value = '06/03/13';
+          document.getElementById('til2').value = '21/05/13';
+          document.getElementById('TxtField').value = '01/08/13';
+          break;
+      case 'Ex. KOM 1.4 unsorted':
+          document.getElementById('TxtPassport0').value = '-21/05/14';
+          document.getElementById('TxtPassport1').value = '+28/12/13';
+          document.getElementById('TxtPassport2').value = '+27/10/13';
+          document.getElementById('TxtPassport3').value = '+06/03/14';
+          document.getElementById('TxtPassport4').value = '-09/01/14';
+          document.getElementById('TxtPassport5').value = '-06/11/13';
+          document.getElementById('TxtField').value = '01/08/14';
+          if (modeCronology) {
+              fncPassport();
+          }
+          break;
+
+
+      case 'Ex. KOM 2.1':
+          document.getElementById('fra0').value = '14/08/13';
+          document.getElementById('til0').value = '30/08/13';
+          document.getElementById('fra1').value = '15/12/13';
+          document.getElementById('til1').value = '01/02/14';
+          document.getElementById('TxtField').value = '01/02/14';
+          break;
+      case 'Ex. KOM 2.2':
+          document.getElementById('fra0').value = '14/08/13';
+          document.getElementById('til0').value = '30/08/13';
+          document.getElementById('fra1').value = '15/12/13';
+          document.getElementById('til1').value = '25/02/14';
+          document.getElementById('TxtField').value = '26/02/14';
+          break;
+      case 'Ex. KOM 2.3':
+          document.getElementById('fra0').value = '14/08/13';
+          document.getElementById('til0').value = '30/08/13';
+          document.getElementById('fra1').value = '15/12/13';
+          document.getElementById('til1').value = '13/03/14';
+          document.getElementById('TxtField').value = '14/03/14';
+          break;
+      case 'Ex. KOM 2.4':
+          document.getElementById('fra0').value = '14/08/13';
+          document.getElementById('til0').value = '30/08/13';
+          document.getElementById('fra1').value = '15/12/13';
+          document.getElementById('til1').value = '22/06/14';
+          document.getElementById('TxtField').value = '22/06/14';
+          break;
+
+      case 'Ex. KOM 3':
+          document.getElementById('fra0').value = '01/01/14';
+          document.getElementById('til0').value = '15/01/14';
+          document.getElementById('fra1').value = '15/02/14';
+          document.getElementById('til1').value = '30/04/14';
+          document.getElementById('TxtField').value = '30/06/14';
+          break;
+      case 'Ex. KOM 4':
+          document.getElementById('fra0').value = '14/08/13';
+          document.getElementById('til0').value = '30/08/13';
+          document.getElementById('fra1').value = '15/12/13';
+          document.getElementById('til1').value = '14/03/14';
+          document.getElementById('TxtField').value = '10/06/14';
+          break;
+      case 'Ex. KOM 5':
+          document.getElementById('fra0').value = '01/01/14';
+          document.getElementById('til0').value = '15/01/14';
+          document.getElementById('fra1').value = '15/02/14';
+          document.getElementById('til1').value = '30/04/14';
+          document.getElementById('TxtField').value = '12/08/14';
+          break;
+      case 'Overstay 1':
+          document.getElementById('fra0').value = '14/08/13';
+          document.getElementById('til0').value = '30/08/13';
+          document.getElementById('fra1').value = '15/10/13';
+          document.getElementById('til1').value = '10/06/14';
+          document.getElementById('TxtField').value = '10/06/14';
+          break;
+      case 'Overstay 2':
+          document.getElementById('fra0').value = '13/06/13';
+          document.getElementById('til0').value = '13/08/13';
+          document.getElementById('fra1').value = '13/10/13';
+          document.getElementById('til1').value = '14/11/13';
+          document.getElementById('TxtField').value = '10/06/14';
+          break;
+      case 'Overstay 3':
+          document.getElementById('fra0').value = '20/09/13';
+          document.getElementById('til0').value = '20/12/13';
+          document.getElementById('fra1').value = '19/03/13';
+          document.getElementById('til1').value = '16/06/14';
+          document.getElementById('TxtField').value = '17/06/14';
+          break;
+      case 'Unsorted':
+          document.getElementById('TxtPassport0').value = '-10/05/14';
+          document.getElementById('TxtPassport1').value = '+28/12/13';
+          document.getElementById('TxtPassport2').value = '+27/10/13';
+          document.getElementById('TxtPassport3').value = '+06/03/14';
+          document.getElementById('TxtPassport4').value = '-09/01/14';
+          document.getElementById('TxtPassport5').value = '-06/11/13';
+          document.getElementById('TxtField').value = '10/05/14';
+          if (modeCronology) {
+              fncPassport();
+          }
+          break;
+      case 'Unsorted 2':
+          document.getElementById('TxtPassport0').value = '-10/05/14';
+          document.getElementById('TxtPassport1').value = '+28/12/13';
+          document.getElementById('TxtPassport2').value = '+27/10/13';
+          document.getElementById('TxtPassport3').value = '+05/01/14';
+          document.getElementById('TxtPassport4').value = '+06/03/14';
+          document.getElementById('TxtPassport5').value = '-09/01/14';
+          document.getElementById('TxtPassport6').value = '-06/11/13';
+          document.getElementById('TxtField').value = '10/05/14';
+          if (modeCronology) {
+              fncPassport();
+          }
+          break;
+      case 'Inconsistance 1':
+          document.getElementById('fra0').value = '20/09/13';
+          document.getElementById('til0').value = '20/12/13';
+          document.getElementById('fra1').value = '16/06/14';
+          document.getElementById('til1').value = '19/03/14';
+          document.getElementById('TxtField').value = '17/06/14';
+          break;
+      case 'Inconsistance 2':
+          document.getElementById('fra0').value = '20/09/13';
+          document.getElementById('til0').value = '20/12/13';
+          document.getElementById('til1').value = '16/06/14';
+          document.getElementById('fra2').value = '20/06/14';
+          document.getElementById('fra3').value = '28/07/14';
+          document.getElementById('til3').value = '22/07/14';
+          document.getElementById('fra4').value = '01/08/14';
+          document.getElementById('til4').value = '22/08/14';
+          document.getElementById('fra5').value = '14/08/14';
+          document.getElementById('til5').value = '27/08/14';
+          document.getElementById('TxtField').value = '17/06/14';
+          break;
+		case 'Test':
+          document.getElementById('fra0').value = '14/08/15';
+          document.getElementById('til0').value = '14/08/15';
+          document.getElementById('fra1').value = '14/08/15';
+          document.getElementById('til1').value = '14/08/15';
+		  document.getElementById('fra2').value = '10/09/15';
+          document.getElementById('til2').value = '20/09/15';
+		   document.getElementById('fra4').value = '01/09/15';
+          document.getElementById('til4').value = '01/09/15';
+          document.getElementById('TxtField').value = '10/10/15';
+          break;
+
+
+      default:
+          document.getElementById('fra0').value = 'ukjent';
+      }
+      return false;
+  }
+//-->
+</script>
+</head>
+<!-- Include the JavaScripTools files -->
+<body onload="setup()" style="background-color: #f7f7f7; font-family: Verdana,Arial,Helvetica,'DejaVu Sans',sans-serif; font-size: 95%;">
+	<FORM>
+		<span id="main_title" style='text-align: center; left:140px; top:-5px; position:absolute; font-size: 1.2em;'>Calculator of travel days remaining <br/>under a Schengen short-stay visa</span>
+		<span style='left:20px; top:50px; position:absolute;'><span id="date_of_entry_control_text_field">Date of entry/Control:</span> <input style="width: 60px" type="text" name="TxtField" id="TxtField" maxlength="8"  onchange="settingDate('TxtField')"> <img id="infoTxtField" style="cursor: pointer;" src="images/info.png"/></span>
+
+		<span style='left:340px; top:54px; position:absolute;  '><input type="radio" name="group1" value="altVisa" id="altVisa" checked> <span id="planning_radio_button">Planning</span>		
+		<input type="radio" name="group1" value="altControl" id="altControl"> <span id="control_radio_button">Control</span> <img style="cursor: pointer;" id="infoPlanningControl" src="images/info.png"/> </span>
+
+		<span style='left:433px; top:150px; position:absolute;  '>
+			<a href="?lang=en"><img border="0" src="images/en.png" /></a>&nbsp;&nbsp;
+			<a href="?lang=fr"><img border="0" src="images/fr.png" /></a>&nbsp;&nbsp;
+			<a href="?lang=es"><img border="0" src="images/es.png" /></a>&nbsp;&nbsp;
+			<a href="?lang=tr"><img border="0" src="images/tr.png" /></a>&nbsp;&nbsp;
+			<a href="?lang=ru"><img border="0" src="images/ru.png" /></a>
+		</span>
+		
+		<span style='left:20px; top:80px;position:absolute; '><input id='cmdPassport' type="checkbox" value='Passport'/><span id="passport_check_box">Passport</span> <img style="cursor: pointer;" id="infoPassport" src="images/info.png"/></span>
+		<span id="entry_exit_data_columns" style='left:20px; top:110px; position:absolute;'>Enter previous stay(s) <br/>in the Schengen area</span>
+
+		<span style='left:85px; top:155px; height: 20px; position:absolute; visibility: hidden;' id="spanInfoPassportInput"><img style="cursor: pointer;" id="infoPassportInput" src="images/info.png"/></span>
+		<span style='left:55px; top:180px; height:466px; width:92px; position:absolute; overflow-y: scroll; visibility: hidden;' id="passportstays"></span>
+
+		<span style='left:45px; top:155px; height: 20px; position:absolute;' id="spanInfoStaysEntryInput"><img style="cursor: pointer;" id="infoStaysEntryInput" src="images/info.png"/></span>
+		<span style='left:105px; top:155px; height: 20px; position:absolute;' id="spanInfoStaysExitInput"><img style="cursor: pointer;" id="infoStaysExitInput" src="images/info.png"/></span>
+		<span style='left:155px; top:155px; height: 20px; position:absolute;' id="spanInfoStaysDays"><img style="cursor: pointer;" id="infoStaysDays" src="images/info.png"/></span>
+		<span style='left:20px; top:180px; height:466px; width:180px; position:absolute; overflow-y: scroll;' id="stays"></span>
+
+		<span style='left:214px; top:180px;  height:310px; width:429px; padding: 8px 0px 0px 10px; position:absolute; background-color: #efefef;' id="report" >Calculation results will display in this area.</span>
+
+		<span style='left:534px; top:520px;position:absolute; '><input style="width: 110px; height: 60px;" id='cmdCalculate' type='button' value='Calculate' onClick="fncCalculate();"/></span>	
+
+		<span id="user_guide" style='left:413px; top:614px; position:absolute;'>
+			<a id="user_guide_link_a" target="_blank" href=""><span id="user_guide_link">User's guide</span></a> 
+			<img class="alIco" border="0" alt="pdf" src="images/f_pdf_16.gif">
+		</span>
+
+		<span style='left:214px; top:610px;position:absolute; '><input id='cmdReset' type='button' value='Reset' onClick="cleanForm();"/> <img style="cursor: pointer;" id="infoReset" src="images/info.png"/></span>
+
+		<span id="disclaimer" style='left:214px; top:520px; position:absolute;'>The calculator is a helping tool only; it<br/>does not constitute a right to stay for a<br/>period resulting from its calculation.</span>
+
+		<span style='left:340px; top:85px;position:absolute;  visibility:hidden'><select name="test" id="testing" onchange="example(this.value)">
+			<option value="empty">Select a test case...</option>
+			<option value="Ex. KOM 1.1">Ex. KOM 1.1</option>
+			<option value="Ex. KOM 1.2">Ex. KOM 1.2</option>
+			<option value="Ex. KOM 1.3">Ex. KOM 1.3</option>
+			<option value="Ex. KOM 1.4">Ex. KOM 1.4</option>
+			<option value="Ex. KOM 1.4 unsorted">Ex. KOM 1.4 unsorted</option>
+			<option value="Ex. KOM 2.1">Ex. KOM 2.1</option>
+			<option value="Ex. KOM 2.2">Ex. KOM 2.2</option>
+			<option value="Ex. KOM 2.3">Ex. KOM 2.3</option>
+			<option value="Ex. KOM 2.4">Ex. KOM 2.4</option>
+			<option value="Ex. KOM 3">Ex. KOM 3</option>
+			<option value="Ex. KOM 4">Ex. KOM 4</option>
+			<option value="Ex. KOM 5">Ex. KOM 5</option>
+			<option value="Ex. KOM 6">Ex. KOM 6</option>
+			<option value="Overstay 1">Overstay 1</option>
+			<option value="Overstay 2">Overstay 2</option>
+			<option value="Overstay 3">Overstay 3</option>
+			<option value="Unsorted">Unsorted</option>
+			<option value="Unsorted 2">Unsorted 2</option>
+			<option value="Inconsistance 1">Inconsistance 1</option>
+			<option value="Inconsistance 2">Inconsistance 2</option>
+			<option value="Test">Test</option><select>
+		</span>
+	</FORM>
+</body>
+</html>
