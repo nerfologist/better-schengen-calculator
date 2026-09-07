@@ -53,6 +53,18 @@ export function ProposedStayTool({ onPreview }: ProposedStayToolProps) {
               onChange={(e) => setEnd(e.target.value)}
             />
           </label>
+          {(start !== '' || end !== '') && (
+            <button
+              type="button"
+              className="btn tool-clear"
+              onClick={() => {
+                setStart('')
+                setEnd('')
+              }}
+            >
+              Clear
+            </button>
+          )}
         </div>
         {range && result?.compliant && (
           <p className="tool-result is-ok" role="status">

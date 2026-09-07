@@ -29,15 +29,22 @@ export function MaxStayTool({ onPreview }: MaxStayToolProps) {
     <details className="tool">
       <summary>How long can I stay?</summary>
       <div className="tool-body">
-        <label>
-          Planned entry date
-          <input
-            type="date"
-            min={today}
-            value={entry}
-            onChange={(e) => setEntry(e.target.value)}
-          />
-        </label>
+        <div className="tool-fields">
+          <label>
+            Planned entry date
+            <input
+              type="date"
+              min={today}
+              value={entry}
+              onChange={(e) => setEntry(e.target.value)}
+            />
+          </label>
+          {entry !== '' && (
+            <button type="button" className="btn tool-clear" onClick={() => setEntry('')}>
+              Clear
+            </button>
+          )}
+        </div>
         {result && result.ok && (
           <p className="tool-result is-ok" role="status">
             You can stay <strong>{result.stayLength} days</strong>, until{' '}

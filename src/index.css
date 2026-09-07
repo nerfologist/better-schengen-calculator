@@ -269,6 +269,11 @@ a {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.tool-clear {
+  align-self: flex-end;
 }
 
 .tool-result {
