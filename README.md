@@ -1,0 +1,55 @@
+# Schengen Days
+
+A better Schengen 90/180-day short-stay calculator. Unlike the official EU
+calculator, it remembers your stays between visits, works well on phones, and
+shows your situation on a calendar timeline.
+
+## Features
+
+- **Persistent stays**: date ranges are stored on-device (localStorage) and
+  survive browser exits and reboots. Export/import a JSON backup for safety or
+  to move data between devices.
+- **Timeline**: the last 7 months plus the next one, with your stays, the
+  rolling 180-day window start, and today highlighted.
+- **Summary**: days used in the current window, days available today, and the
+  latest exit date if you entered today.
+- **Trip planning**: given an entry date, the latest allowed exit date; given a
+  proposed date range, whether it complies with the 90/180 rule (and if not,
+  when it breaks and by how much). Planned stays already recorded in the
+  future are taken into account.
+- **PWA**: installable on a phone's home screen, fully offline-capable.
+
+## The rule
+
+Third-country nationals under the short-stay regime may spend at most **90
+days in any 180-day period** in the Schengen area. Entry and exit days both
+count. Compliance must hold on every day of presence: for each such day, the
+180 days ending on it (inclusive) must contain at most 90 days of presence.
+
+The core logic lives in `src/domain/` as pure TypeScript with a test suite of
+hand-verified scenarios (`npm test`). Dates are handled as integer day numbers
+derived from UTC calendar dates, so timezone and DST bugs are impossible by
+construction.
+
+## Development
+
+```sh
+npm install
+npm run dev        # dev server
+npm test           # vitest watch mode (npm test -- --run for one pass)
+npm run build      # type-check + production build with PWA assets
+npm run preview    # serve the production build
+```
+
+## Deployment
+
+Pushes to `main` run tests, build, and deploy to GitHub Pages via
+`.github/workflows/deploy.yml`. The Vite `base` path is set to the repo name
+in `vite.config.ts`; if you fork under a different name, update it there.
+In the repo settings, set Pages > Source to "GitHub Actions".
+
+## Disclaimer
+
+Informational only, not legal advice. Verify against the
+[official EU calculator](https://ec.europa.eu/assets/home/visa-calculator/calculator.htm?lang=en)
+and the authorities of the country you visit.
