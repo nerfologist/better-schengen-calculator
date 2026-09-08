@@ -33,16 +33,19 @@ export function Timeline({ preview }: TimelineProps) {
         setPendingStart(day)
         return
       }
-      dispatch({
-        type: 'add',
-        stay: {
-          entry: toIso(Math.min(pendingStart, day)),
-          exit: toIso(Math.max(pendingStart, day)),
-        },
-      })
+      const start = Math.min(pendingStart, day)
+      const end = Math.max(pendingStart, day)
+      const days = end - start + 1
+      const kind = start > todayNum ? 'planned stay' : 'stay'
+      const confirmed = window.confirm(
+        `Add a ${kind} from ${formatDay(start)} to ${formatDay(end)} (${days} ${days === 1 ? 'day' : 'days'})?`,
+      )
+      if (confirmed) {
+        dispatch({ type: 'add', stay: { entry: toIso(start), exit: toIso(end) } })
+      }
       setPendingStart(null)
     },
-    [pendingStart, dispatch],
+    [pendingStart, todayNum, dispatch],
   )
 
   useEffect(() => {
