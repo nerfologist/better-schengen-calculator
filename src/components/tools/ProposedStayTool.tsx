@@ -4,6 +4,7 @@ import { checkStay } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
 import { formatDay, formatDayShort } from '../../ui/format'
+import { usePersistedInput } from '../../ui/usePersistedInput'
 import type { PlanRecap } from './recap'
 
 export interface ProposedStayToolProps {
@@ -13,8 +14,10 @@ export interface ProposedStayToolProps {
 
 export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) {
   const { mergedRanges } = useStays()
-  const [start, setStart] = useState('')
-  const [end, setEnd] = useState('')
+  const [start, setStart] = usePersistedInput('schengen-calc:plan.proposedStart')
+  const [end, setEnd] = usePersistedInput('schengen-calc:plan.proposedEnd')
+  // Persisted dates mean an ongoing calculation: start open so it shows.
+  const [open, setOpen] = useState(() => start !== '' || end !== '')
 
   const range = useMemo<DayRange | null>(() => {
     if (!isValidIso(start) || !isValidIso(end)) return null
@@ -49,7 +52,11 @@ export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) 
   }, [range, result, onPreview, onRecap])
 
   return (
-    <details className="tool">
+    <details
+      className="tool"
+      open={open}
+      onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}
+    >
       <summary>Would this trip be OK?</summary>
       <div className="tool-body">
         <div className="tool-fields">

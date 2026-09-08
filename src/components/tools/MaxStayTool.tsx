@@ -3,6 +3,7 @@ import { isValidIso, toDayNum } from '../../domain/dates'
 import { latestExit } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
+import { usePersistedInput } from '../../ui/usePersistedInput'
 import { formatDay, formatDayShort } from '../../ui/format'
 import type { PlanRecap } from './recap'
 
@@ -13,7 +14,9 @@ export interface MaxStayToolProps {
 
 export function MaxStayTool({ onPreview, onRecap }: MaxStayToolProps) {
   const { mergedRanges, today } = useStays()
-  const [entry, setEntry] = useState('')
+  const [entry, setEntry] = usePersistedInput('schengen-calc:plan.maxEntry')
+  // A persisted date means an ongoing calculation: start open so it shows.
+  const [open, setOpen] = useState(() => entry !== '')
 
   const result = useMemo(
     () => (isValidIso(entry) ? latestExit(mergedRanges, toDayNum(entry)) : null),
@@ -49,7 +52,11 @@ export function MaxStayTool({ onPreview, onRecap }: MaxStayToolProps) {
   }, [result, entry, onPreview, onRecap])
 
   return (
-    <details className="tool">
+    <details
+      className="tool"
+      open={open}
+      onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}
+    >
       <summary>How long can I stay?</summary>
       <div className="tool-body">
         <div className="tool-fields">
