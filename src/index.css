@@ -468,17 +468,45 @@ a {
   }
 }
 
-/* FAQ dialog: same chrome as the confirm dialog, roomier and scrollable. */
+/* FAQ dialog: same chrome as the confirm dialog, roomier. The dialog itself
+   never scrolls; the inner body does, so the scrollbar stays clipped inside
+   the rounded corners and below the header. */
 .faq-dialog {
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--surface);
   color: var(--text);
-  padding: 1.5rem;
+  padding: 0;
   width: min(92vw, 560px);
   max-height: 85vh;
-  overflow-y: auto;
+  overflow: hidden;
   box-shadow: 0 18px 50px rgb(0 0 0 / 0.3);
+}
+
+.faq-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.faq-body {
+  overflow-y: auto;
+  min-height: 0;
+  padding: 0 1.5rem 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.faq-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.faq-body::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.faq-body::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .faq-dialog::backdrop {
@@ -501,7 +529,10 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 1rem;
+  padding: 1.25rem 1.5rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.9rem;
+  flex-shrink: 0;
 }
 
 .faq-header .confirm-title {

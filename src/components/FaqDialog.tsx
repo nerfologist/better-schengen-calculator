@@ -124,12 +124,14 @@ export function FaqDialog({ open, onClose }: FaqDialogProps) {
           Close
         </button>
       </div>
-      {FAQ_ITEMS.map((item) => (
-        <details key={item.question} className="tool" onToggle={closeSiblings}>
-          <summary>{item.question}</summary>
-          <div className="tool-body">{item.answer}</div>
-        </details>
-      ))}
+      <div className="faq-body">
+        {FAQ_ITEMS.map((item) => (
+          <details key={item.question} className="tool" onToggle={closeSiblings}>
+            <summary>{item.question}</summary>
+            <div className="tool-body">{item.answer}</div>
+          </details>
+        ))}
+      </div>
     </dialog>
   )
 }
