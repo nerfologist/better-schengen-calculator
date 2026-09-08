@@ -18,7 +18,9 @@ export function StayList() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const todayNum = toDayNum(today)
 
-  const sorted = [...stays].sort((a, b) => toDayNum(b.entry) - toDayNum(a.entry))
+  // Chronological, oldest first: reads like a travel log, and matches the
+  // timeline's top-to-bottom order. Planned stays close the list.
+  const sorted = [...stays].sort((a, b) => toDayNum(a.entry) - toDayNum(b.entry))
   const planned = sorted.filter((s) => toDayNum(s.entry) > todayNum)
   const spent = sorted.filter((s) => toDayNum(s.entry) <= todayNum)
 
@@ -76,16 +78,16 @@ export function StayList() {
           No stays recorded yet. Add each period you spent in the Schengen area below.
         </p>
       )}
+      {planned.length > 0 && spent.length > 0 && (
+        <h3 className="stay-group-title">Past and current</h3>
+      )}
+      <ul className="stay-list">{spent.map((s) => renderRow(s, false))}</ul>
       {planned.length > 0 && (
         <>
           <h3 className="stay-group-title">Planned</h3>
           <ul className="stay-list">{planned.map((s) => renderRow(s, true))}</ul>
         </>
       )}
-      {planned.length > 0 && spent.length > 0 && (
-        <h3 className="stay-group-title">Past and current</h3>
-      )}
-      <ul className="stay-list">{spent.map((s) => renderRow(s, false))}</ul>
       <h3 className="add-stay-title">Add a stay</h3>
       <StayForm onSave={(stay) => dispatch({ type: 'add', stay })} />
     </section>
