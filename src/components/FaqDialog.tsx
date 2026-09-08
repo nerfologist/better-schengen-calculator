@@ -1,7 +1,42 @@
-export function Faq() {
+import { useEffect, useRef } from 'react'
+
+export interface FaqDialogProps {
+  open: boolean
+  onClose: () => void
+}
+
+export function FaqDialog({ open, onClose }: FaqDialogProps) {
+  const ref = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    const dialog = ref.current
+    if (!dialog) return
+    if (open && !dialog.open) dialog.showModal()
+    if (!open && dialog.open) dialog.close()
+  }, [open])
+
   return (
-    <section id="faq" aria-label="How the rule works">
-      <h2>How the 90/180 rule works</h2>
+    <dialog
+      ref={ref}
+      className="faq-dialog"
+      aria-labelledby="faq-title"
+      onCancel={(e) => {
+        e.preventDefault()
+        onClose()
+      }}
+      onClick={(e) => {
+        // A click on the backdrop lands on the dialog element itself.
+        if (e.target === ref.current) onClose()
+      }}
+    >
+      <div className="faq-header">
+        <h2 id="faq-title" className="confirm-title">
+          How the 90/180 rule works
+        </h2>
+        <button type="button" className="btn btn-small" onClick={onClose} aria-label="Close">
+          Close
+        </button>
+      </div>
       <details className="tool">
         <summary>What is the rule, in one sentence?</summary>
         <div className="tool-body">
@@ -51,8 +86,8 @@ export function Faq() {
             days, then went home. If you come back on June 1st, the window ending on any
             June day still contains those winter days, so you have only about 31 days
             available. But every day you wait after the end of July, a January day drops
-            out of the window and gives you a day back. The calculator above does exactly
-            this arithmetic for every day of your planned trip.
+            out of the window and gives you a day back. The calculator does exactly this
+            arithmetic for every day of your planned trip.
           </p>
         </div>
       </details>
@@ -70,6 +105,6 @@ export function Faq() {
           </p>
         </div>
       </details>
-    </section>
+    </dialog>
   )
 }

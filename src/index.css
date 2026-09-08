@@ -50,15 +50,15 @@ html {
   }
 }
 
-/* Keep the anchored FAQ heading clear of the pinned summary block. */
-#faq {
-  scroll-margin-top: 20rem;
-}
-
-@media (min-width: 640px) {
-  #faq {
-    scroll-margin-top: 9rem;
-  }
+/* Buttons that read as links (e.g. the FAQ opener). */
+.link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 body {
@@ -438,6 +438,50 @@ a {
   .confirm-dialog[open] {
     animation: none;
   }
+}
+
+/* FAQ dialog: same chrome as the confirm dialog, roomier and scrollable. */
+.faq-dialog {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 1.5rem;
+  width: min(92vw, 560px);
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.3);
+}
+
+.faq-dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.faq-dialog[open] {
+  animation: confirm-pop 0.18s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-dialog[open] {
+    animation: none;
+  }
+}
+
+.faq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.faq-header .confirm-title {
+  margin: 0;
+}
+
+.faq-dialog .tool {
+  background: var(--bg);
 }
 
 .confirm-title {
