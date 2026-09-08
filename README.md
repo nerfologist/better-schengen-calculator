@@ -43,10 +43,18 @@ npm run preview    # serve the production build
 
 ## Deployment
 
-Pushes to `main` run tests, build, and deploy to GitHub Pages via
-`.github/workflows/deploy.yml`. The Vite `base` path is set to the repo name
-in `vite.config.ts`; if you fork under a different name, update it there.
-In the repo settings, set Pages > Source to "GitHub Actions".
+Every push to `main` runs tests and a build check (`ci.yml`). Deployment to
+GitHub Pages happens only when a release is published (`deploy.yml`), e.g.:
+
+```sh
+gh release create v0.2.0 --generate-notes
+```
+
+The deploy builds the tagged commit, gated by the test suite. It can also be
+triggered manually from the Actions tab (workflow_dispatch). The Vite `base`
+path is set to the repo name in `vite.config.ts`; if you fork under a
+different name, update it there. In the repo settings, set Pages > Source to
+"GitHub Actions".
 
 ## Disclaimer
 
