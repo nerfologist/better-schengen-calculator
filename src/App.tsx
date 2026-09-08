@@ -5,6 +5,7 @@ import { SummaryCards } from './components/SummaryCards'
 import { Timeline } from './components/Timeline/Timeline'
 import { MaxStayTool } from './components/tools/MaxStayTool'
 import { ProposedStayTool } from './components/tools/ProposedStayTool'
+import type { PlanRecap } from './components/tools/recap'
 import type { DayRange } from './domain/types'
 import { useStays } from './state/StaysContext'
 import { formatDayShort } from './ui/format'
@@ -13,12 +14,16 @@ export default function App() {
   const { violations } = useStays()
   const [maxPreview, setMaxPreview] = useState<DayRange | null>(null)
   const [proposedPreview, setProposedPreview] = useState<DayRange | null>(null)
+  const [maxRecap, setMaxRecap] = useState<PlanRecap | null>(null)
+  const [proposedRecap, setProposedRecap] = useState<PlanRecap | null>(null)
 
   const onMaxPreview = useCallback((r: DayRange | null) => setMaxPreview(r), [])
   const onProposedPreview = useCallback(
     (r: DayRange | null) => setProposedPreview(r),
     [],
   )
+  const onMaxRecap = useCallback((r: PlanRecap | null) => setMaxRecap(r), [])
+  const onProposedRecap = useCallback((r: PlanRecap | null) => setProposedRecap(r), [])
 
   return (
     <div className="app">
@@ -41,13 +46,13 @@ export default function App() {
 
       <StayList />
 
-      <SummaryCards />
+      <SummaryCards recap={proposedRecap ?? maxRecap} />
       <Timeline preview={proposedPreview ?? maxPreview} />
 
       <section aria-label="Planning tools">
         <h2>Plan a trip</h2>
-        <MaxStayTool onPreview={onMaxPreview} />
-        <ProposedStayTool onPreview={onProposedPreview} />
+        <MaxStayTool onPreview={onMaxPreview} onRecap={onMaxRecap} />
+        <ProposedStayTool onPreview={onProposedPreview} onRecap={onProposedRecap} />
       </section>
 
       <footer className="app-footer">

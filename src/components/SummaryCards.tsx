@@ -1,8 +1,13 @@
 import { toDayNum } from '../domain/dates'
 import { useStays } from '../state/StaysContext'
 import { formatDay, formatDayShort } from '../ui/format'
+import type { PlanRecap } from './tools/recap'
 
-export function SummaryCards() {
+export interface SummaryCardsProps {
+  recap: PlanRecap | null
+}
+
+export function SummaryCards({ recap }: SummaryCardsProps) {
   const { summary, mergedRanges, today } = useStays()
   const { used, remaining, window, latestExitIfEnteringToday } = summary
   const todayNum = toDayNum(today)
@@ -40,6 +45,12 @@ export function SummaryCards() {
         </span>
         <span className="card-label">latest exit if you enter today</span>
       </div>
+      {recap && (
+        <div className={`plan-recap ${recap.ok ? 'is-ok' : 'is-bad'}`} role="status">
+          <span className="plan-recap-tag">Trip check</span>
+          <span>{recap.text}</span>
+        </div>
+      )}
     </section>
   )
 }

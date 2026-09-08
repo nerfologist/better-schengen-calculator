@@ -3,13 +3,15 @@ import { isValidIso, toDayNum } from '../../domain/dates'
 import { latestExit } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
-import { formatDay } from '../../ui/format'
+import { formatDay, formatDayShort } from '../../ui/format'
+import type { PlanRecap } from './recap'
 
 export interface MaxStayToolProps {
   onPreview: (range: DayRange | null) => void
+  onRecap: (recap: PlanRecap | null) => void
 }
 
-export function MaxStayTool({ onPreview }: MaxStayToolProps) {
+export function MaxStayTool({ onPreview, onRecap }: MaxStayToolProps) {
   const { mergedRanges, today } = useStays()
   const [entry, setEntry] = useState('')
 
@@ -22,8 +24,29 @@ export function MaxStayTool({ onPreview }: MaxStayToolProps) {
     onPreview(
       result?.ok ? { start: toDayNum(entry), end: result.exitDay } : null,
     )
-    return () => onPreview(null)
-  }, [result, entry, onPreview])
+    if (!result) {
+      onRecap(null)
+    } else {
+      const enterOn = `Enter ${formatDayShort(toDayNum(entry))}`
+      if (result.ok) {
+        onRecap({
+          ok: true,
+          text: `${enterOn}: up to ${result.stayLength} days, until ${formatDayShort(result.exitDay)}`,
+        })
+      } else if (result.reason === 'entry-day-not-compliant') {
+        onRecap({ ok: false, text: `${enterOn}: not allowed, ${result.usedOnEntry}/90 days` })
+      } else {
+        onRecap({
+          ok: false,
+          text: `${enterOn}: would break your booking on ${formatDayShort(result.conflictDay)}`,
+        })
+      }
+    }
+    return () => {
+      onPreview(null)
+      onRecap(null)
+    }
+  }, [result, entry, onPreview, onRecap])
 
   return (
     <details className="tool">

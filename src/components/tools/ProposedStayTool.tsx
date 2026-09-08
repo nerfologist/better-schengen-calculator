@@ -3,13 +3,15 @@ import { isValidIso, toDayNum } from '../../domain/dates'
 import { checkStay } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
-import { formatDay } from '../../ui/format'
+import { formatDay, formatDayShort } from '../../ui/format'
+import type { PlanRecap } from './recap'
 
 export interface ProposedStayToolProps {
   onPreview: (range: DayRange | null) => void
+  onRecap: (recap: PlanRecap | null) => void
 }
 
-export function ProposedStayTool({ onPreview }: ProposedStayToolProps) {
+export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) {
   const { mergedRanges } = useStays()
   const [start, setStart] = useState('')
   const [end, setEnd] = useState('')
@@ -27,8 +29,24 @@ export function ProposedStayTool({ onPreview }: ProposedStayToolProps) {
 
   useEffect(() => {
     onPreview(range)
-    return () => onPreview(null)
-  }, [range, onPreview])
+    if (!range || !result) {
+      onRecap(null)
+    } else {
+      const dates = `${formatDayShort(range.start)} to ${formatDayShort(range.end)}`
+      onRecap(
+        result.compliant
+          ? { ok: true, text: `${dates}: OK, peaks at ${result.peakUsage}/90` }
+          : {
+              ok: false,
+              text: `${dates}: breaks the rule on ${formatDayShort(result.firstViolation)}`,
+            },
+      )
+    }
+    return () => {
+      onPreview(null)
+      onRecap(null)
+    }
+  }, [range, result, onPreview, onRecap])
 
   return (
     <details className="tool">

@@ -44,15 +44,18 @@ export function Timeline({ preview }: TimelineProps) {
     },
     [pendingStart],
   )
-  const onConfirm = useCallback(() => {
-    if (confirmRange) {
-      dispatch({
-        type: 'add',
-        stay: { entry: toIso(confirmRange.start), exit: toIso(confirmRange.end) },
-      })
-    }
-    setConfirmRange(null)
-  }, [confirmRange, dispatch])
+  const onConfirm = useCallback(
+    (label?: string) => {
+      if (confirmRange) {
+        dispatch({
+          type: 'add',
+          stay: { entry: toIso(confirmRange.start), exit: toIso(confirmRange.end), label },
+        })
+      }
+      setConfirmRange(null)
+    },
+    [confirmRange, dispatch],
+  )
 
   useEffect(() => {
     if (pendingStart === null) return
