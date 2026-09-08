@@ -721,4 +721,11 @@ input[type='text'] {
   gap: 0.5rem;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .export-import {
+    justify-content: flex-start;
+  }
 }
