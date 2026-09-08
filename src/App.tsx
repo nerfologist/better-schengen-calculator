@@ -65,13 +65,12 @@ export default function App() {
       <footer className="app-footer">
         <ExportImport />
         <p className="muted">
-          <button type="button" className="link-button" onClick={() => setFaqOpen(true)}>
-            How does the 90/180 rule work?
-          </button>
-        </p>
-        <p className="muted">
           Data is stored only on this device. This tool is informational and not
-          legal advice; verify with the{' '}
+          legal advice: read{' '}
+          <button type="button" className="link-button" onClick={() => setFaqOpen(true)}>
+            how the 90/180 rule works
+          </button>
+          , and verify with the{' '}
           <a
             href="https://ec.europa.eu/assets/home/visa-calculator/calculator.htm?lang=en"
             target="_blank"
