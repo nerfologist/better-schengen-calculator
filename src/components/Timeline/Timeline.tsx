@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { toDayNum, toIso } from '../../domain/dates'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
@@ -21,6 +22,16 @@ export interface TimelineProps {
 export function Timeline({ preview }: TimelineProps) {
   const { mergedRanges, summary, today } = useStays()
   const todayNum = toDayNum(today)
+  const previewEnd = preview?.end
+
+  // When a planning tool produces a result, bring its exit date into view.
+  useEffect(() => {
+    if (previewEnd === undefined) return
+    const cell = document.querySelector(`[data-day="${previewEnd}"]`)
+    if (!cell) return
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    cell.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' })
+  }, [previewEnd])
 
   const [y, m] = today.split('-').map(Number)
   const todayIdx = y * 12 + (m - 1)

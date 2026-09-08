@@ -28,7 +28,7 @@ export function DayCell({ day, merged, window, todayNum, preview }: DayCellProps
   const title = presence ? `${formatDay(day)}: in Schengen` : formatDay(day)
 
   return (
-    <span className={classes.join(' ')} title={title}>
+    <span className={classes.join(' ')} title={title} data-day={day}>
       {dayOfMonth}
     </span>
   )
