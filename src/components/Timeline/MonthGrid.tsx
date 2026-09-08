@@ -12,11 +12,22 @@ export interface MonthGridProps {
   window: DayRange
   todayNum: DayNum
   preview: DayRange | null
+  pendingStart: DayNum | null
+  onTap: (day: DayNum) => void
 }
 
 const MS_PER_DAY = 86_400_000
 
-export function MonthGrid({ year, month0, merged, window, todayNum, preview }: MonthGridProps) {
+export function MonthGrid({
+  year,
+  month0,
+  merged,
+  window,
+  todayNum,
+  preview,
+  pendingStart,
+  onTap,
+}: MonthGridProps) {
   const firstDay = Date.UTC(year, month0, 1) / MS_PER_DAY
   const daysInMonth = new Date(Date.UTC(year, month0 + 1, 0)).getUTCDate()
   // Monday-first column offset; 1970-01-01 (day 0) was a Thursday.
@@ -47,6 +58,8 @@ export function MonthGrid({ year, month0, merged, window, todayNum, preview }: M
               window={window}
               todayNum={todayNum}
               preview={preview}
+              pendingStart={pendingStart}
+              onTap={onTap}
             />
           ),
         )}

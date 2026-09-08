@@ -180,6 +180,24 @@ a {
   font-size: 0.72rem;
   border-radius: 6px;
   position: relative;
+  /* Cells are buttons (tap-to-add); neutralize the native button look. */
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.day:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.day--pending {
+  box-shadow: inset 0 0 0 2px var(--accent);
+  font-weight: 700;
 }
 
 .day--stay {
@@ -214,6 +232,33 @@ a {
     color-mix(in srgb, var(--ok-text) 55%, transparent) 0 4px,
     transparent 4px 8px
   );
+}
+
+.timeline-tip {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+}
+
+.timeline-hint {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 10;
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.15);
+}
+
+.btn-small {
+  min-height: 34px;
+  padding: 0.25rem 0.7rem;
 }
 
 .legend {

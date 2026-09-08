@@ -8,13 +8,23 @@ export interface DayCellProps {
   window: DayRange
   todayNum: DayNum
   preview: DayRange | null
+  pendingStart: DayNum | null
+  onTap: (day: DayNum) => void
 }
 
 function inRange(day: DayNum, r: DayRange): boolean {
   return r.start <= day && day <= r.end
 }
 
-export function DayCell({ day, merged, window, todayNum, preview }: DayCellProps) {
+export function DayCell({
+  day,
+  merged,
+  window,
+  todayNum,
+  preview,
+  pendingStart,
+  onTap,
+}: DayCellProps) {
   const presence = merged.some((r) => inRange(day, r))
   const inWindow = inRange(day, window)
 
@@ -23,13 +33,23 @@ export function DayCell({ day, merged, window, todayNum, preview }: DayCellProps
   if (day === window.start) classes.push('day--wstart')
   if (day === todayNum) classes.push('day--today')
   if (preview && inRange(day, preview)) classes.push('day--preview')
+  if (day === pendingStart) classes.push('day--pending')
 
   const dayOfMonth = new Date(day * 86_400_000).getUTCDate()
   const title = presence ? `${formatDay(day)}: in Schengen` : formatDay(day)
 
   return (
-    <span className={classes.join(' ')} title={title} data-day={day}>
+    <button
+      type="button"
+      className={classes.join(' ')}
+      title={title}
+      data-day={day}
+      aria-label={
+        pendingStart !== null ? `${formatDay(day)}: tap to end the stay here` : `${formatDay(day)}: tap to start adding a stay`
+      }
+      onClick={() => onTap(day)}
+    >
       {dayOfMonth}
-    </span>
+    </button>
   )
 }

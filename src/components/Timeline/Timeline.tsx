@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
-import { toDayNum, toIso } from '../../domain/dates'
+import { useCallback, useEffect, useState } from 'react'
+import { toDayNum, toIso, type DayNum } from '../../domain/dates'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
+import { formatDay } from '../../ui/format'
 import { MonthGrid } from './MonthGrid'
 
 const MONTHS_BACK = 6
@@ -20,9 +21,38 @@ export interface TimelineProps {
 }
 
 export function Timeline({ preview }: TimelineProps) {
-  const { mergedRanges, summary, today } = useStays()
+  const { mergedRanges, summary, today, dispatch } = useStays()
   const todayNum = toDayNum(today)
   const previewEnd = preview?.end
+
+  // Tap-to-add: first tap picks one end of the stay, second tap completes it.
+  const [pendingStart, setPendingStart] = useState<DayNum | null>(null)
+  const onTap = useCallback(
+    (day: DayNum) => {
+      if (pendingStart === null) {
+        setPendingStart(day)
+        return
+      }
+      dispatch({
+        type: 'add',
+        stay: {
+          entry: toIso(Math.min(pendingStart, day)),
+          exit: toIso(Math.max(pendingStart, day)),
+        },
+      })
+      setPendingStart(null)
+    },
+    [pendingStart, dispatch],
+  )
+
+  useEffect(() => {
+    if (pendingStart === null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPendingStart(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [pendingStart])
 
   // When a planning tool produces a result, bring its exit date into view.
   useEffect(() => {
@@ -54,6 +84,19 @@ export function Timeline({ preview }: TimelineProps) {
 
   return (
     <section aria-label="Timeline">
+      {pendingStart === null ? (
+        <p className="timeline-tip muted">Tip: tap a day to start adding a stay.</p>
+      ) : (
+        <p className="timeline-hint" role="status">
+          <span>
+            Adding a stay starting <strong>{formatDay(pendingStart)}</strong>: now tap the
+            last day (the same day works for a 1-day stay).
+          </span>
+          <button type="button" className="btn btn-small" onClick={() => setPendingStart(null)}>
+            Cancel
+          </button>
+        </p>
+      )}
       <div className="timeline">
         {months.map(({ year, month0 }) => (
           <MonthGrid
@@ -64,6 +107,8 @@ export function Timeline({ preview }: TimelineProps) {
             window={summary.window}
             todayNum={todayNum}
             preview={preview}
+            pendingStart={pendingStart}
+            onTap={onTap}
           />
         ))}
       </div>
