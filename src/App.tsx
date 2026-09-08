@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { ExportImport } from './components/ExportImport'
+import { Faq } from './components/Faq'
 import { StayList } from './components/StayList'
 import { SummaryCards } from './components/SummaryCards'
 import { Timeline } from './components/Timeline/Timeline'
@@ -30,7 +31,8 @@ export default function App() {
       <header className="app-header">
         <h1>Schengen Days</h1>
         <p className="muted">
-          Track your short stays under the 90-days-in-any-180-days rule.
+          Track your short stays under the 90-days-in-any-180-days rule.{' '}
+          <a href="#faq">How does the rule work?</a>
         </p>
       </header>
 
@@ -55,8 +57,13 @@ export default function App() {
         <ProposedStayTool onPreview={onProposedPreview} onRecap={onProposedRecap} />
       </section>
 
+      <Faq />
+
       <footer className="app-footer">
         <ExportImport />
+        <p className="muted">
+          <a href="#faq">How does the 90/180 rule work?</a>
+        </p>
         <p className="muted">
           Data is stored only on this device. This tool is informational and not
           legal advice; verify with the{' '}
