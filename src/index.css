@@ -355,6 +355,75 @@ a {
   color: var(--danger);
 }
 
+/* Add-stay confirmation dialog */
+.confirm-dialog {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 1.5rem;
+  width: min(90vw, 380px);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.3);
+}
+
+.confirm-dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.confirm-dialog[open] {
+  animation: confirm-pop 0.18s ease-out;
+}
+
+@keyframes confirm-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confirm-dialog[open] {
+    animation: none;
+  }
+}
+
+.confirm-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+.confirm-range {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+
+.confirm-arrow {
+  color: var(--accent);
+  margin: 0 0.45rem;
+}
+
+.confirm-days {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
 /* Forms */
 label {
   display: flex;

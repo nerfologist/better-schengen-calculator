@@ -3,6 +3,7 @@ import { toDayNum, toIso, type DayNum } from '../../domain/dates'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
 import { formatDay } from '../../ui/format'
+import { ConfirmStayDialog } from './ConfirmStayDialog'
 import { MonthGrid } from './MonthGrid'
 
 const MONTHS_BACK = 6
@@ -25,28 +26,33 @@ export function Timeline({ preview }: TimelineProps) {
   const todayNum = toDayNum(today)
   const previewEnd = preview?.end
 
-  // Tap-to-add: first tap picks one end of the stay, second tap completes it.
+  // Tap-to-add: first tap picks one end of the stay, the second opens the
+  // confirmation dialog, and confirming records the stay.
   const [pendingStart, setPendingStart] = useState<DayNum | null>(null)
+  const [confirmRange, setConfirmRange] = useState<DayRange | null>(null)
   const onTap = useCallback(
     (day: DayNum) => {
       if (pendingStart === null) {
         setPendingStart(day)
         return
       }
-      const start = Math.min(pendingStart, day)
-      const end = Math.max(pendingStart, day)
-      const days = end - start + 1
-      const kind = start > todayNum ? 'planned stay' : 'stay'
-      const confirmed = window.confirm(
-        `Add a ${kind} from ${formatDay(start)} to ${formatDay(end)} (${days} ${days === 1 ? 'day' : 'days'})?`,
-      )
-      if (confirmed) {
-        dispatch({ type: 'add', stay: { entry: toIso(start), exit: toIso(end) } })
-      }
+      setConfirmRange({
+        start: Math.min(pendingStart, day),
+        end: Math.max(pendingStart, day),
+      })
       setPendingStart(null)
     },
-    [pendingStart, todayNum, dispatch],
+    [pendingStart],
   )
+  const onConfirm = useCallback(() => {
+    if (confirmRange) {
+      dispatch({
+        type: 'add',
+        stay: { entry: toIso(confirmRange.start), exit: toIso(confirmRange.end) },
+      })
+    }
+    setConfirmRange(null)
+  }, [confirmRange, dispatch])
 
   useEffect(() => {
     if (pendingStart === null) return
@@ -116,6 +122,12 @@ export function Timeline({ preview }: TimelineProps) {
           />
         ))}
       </div>
+      <ConfirmStayDialog
+        range={confirmRange}
+        todayNum={todayNum}
+        onConfirm={onConfirm}
+        onCancel={() => setConfirmRange(null)}
+      />
       <ul className="legend">
         <li>
           <i className="day-swatch day--stay" /> In Schengen (counts)
