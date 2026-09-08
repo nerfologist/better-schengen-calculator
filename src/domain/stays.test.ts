@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { toDayNum } from './dates'
-import { mergeRanges, mergedRangesOf, rangeLength, toRanges } from './stays'
+import { mergeRanges, mergeStayInto, mergedRangesOf, rangeLength, toRanges } from './stays'
 import type { Stay } from './types'
 
 function stay(entry: string, exit: string, id = 'x'): Stay {
@@ -42,6 +42,54 @@ describe('stays', () => {
 
   it('rejects reversed ranges', () => {
     expect(() => toRanges([stay('2026-01-10', '2026-01-01')])).toThrow()
+  })
+
+  describe('mergeStayInto (no day belongs to two stays)', () => {
+    const existing = [
+      stay('2026-01-01', '2026-01-10', 'a'),
+      stay('2026-03-01', '2026-03-05', 'b'),
+    ]
+
+    it('appends a non-overlapping stay', () => {
+      const result = mergeStayInto(existing, stay('2026-02-01', '2026-02-05', 'c'))
+      expect(result).toHaveLength(3)
+    })
+
+    it('absorbs an overlapping stay into one record', () => {
+      const result = mergeStayInto(existing, stay('2026-01-05', '2026-01-20', 'c'))
+      expect(result).toHaveLength(2)
+      const merged = result.find((s) => s.id === 'c')
+      expect(merged).toMatchObject({ entry: '2026-01-01', exit: '2026-01-20' })
+    })
+
+    it('re-adding the same range changes nothing but the record id', () => {
+      const result = mergeStayInto(existing, stay('2026-01-01', '2026-01-10', 'c'))
+      expect(result).toHaveLength(2)
+      expect(result.find((s) => s.id === 'c')).toMatchObject({
+        entry: '2026-01-01',
+        exit: '2026-01-10',
+      })
+    })
+
+    it('a range spanning several stays absorbs them all', () => {
+      const result = mergeStayInto(existing, stay('2026-01-08', '2026-03-02', 'c'))
+      expect(result).toHaveLength(1)
+      expect(result[0]).toMatchObject({ entry: '2026-01-01', exit: '2026-03-05' })
+    })
+
+    it('keeps adjacent-but-disjoint trips separate', () => {
+      const result = mergeStayInto(existing, stay('2026-01-11', '2026-01-15', 'c'))
+      expect(result).toHaveLength(3)
+    })
+
+    it('prefers the new label, falls back to the absorbed stay label', () => {
+      const labelled = [{ ...stay('2026-01-01', '2026-01-10', 'a'), label: 'Paris' }]
+      expect(mergeStayInto(labelled, stay('2026-01-05', '2026-01-12', 'b'))[0].label).toBe('Paris')
+      expect(
+        mergeStayInto(labelled, { ...stay('2026-01-05', '2026-01-12', 'b'), label: 'Lyon' })[0]
+          .label,
+      ).toBe('Lyon')
+    })
   })
 
   it('does not mutate its input', () => {

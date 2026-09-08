@@ -1,4 +1,4 @@
-import { toDayNum } from './dates'
+import { toDayNum, toIso } from './dates'
 import type { DayRange, Stay } from './types'
 
 export function toRanges(stays: Stay[]): DayRange[] {
@@ -34,4 +34,28 @@ export function rangeLength(r: DayRange): number {
 
 export function mergedRangesOf(stays: Stay[]): DayRange[] {
   return mergeRanges(toRanges(stays))
+}
+
+/**
+ * Add a stay while keeping the invariant that no day belongs to two stays:
+ * any existing stays sharing at least one day with the new one are absorbed
+ * into a single record spanning them all. Adjacent-but-disjoint stays stay
+ * separate; they are distinct trips.
+ */
+export function mergeStayInto(stays: Stay[], stay: Stay): Stay[] {
+  const start = toDayNum(stay.entry)
+  const end = toDayNum(stay.exit)
+  const overlapping = stays.filter(
+    (s) => toDayNum(s.entry) <= end && start <= toDayNum(s.exit),
+  )
+  if (overlapping.length === 0) return [...stays, stay]
+
+  const all = [...overlapping, stay]
+  const merged: Stay = {
+    id: stay.id,
+    entry: toIso(Math.min(...all.map((s) => toDayNum(s.entry)))),
+    exit: toIso(Math.max(...all.map((s) => toDayNum(s.exit)))),
+    label: stay.label ?? overlapping.find((s) => s.label)?.label,
+  }
+  return [...stays.filter((s) => !overlapping.includes(s)), merged]
 }

@@ -29,14 +29,20 @@ export function DayCell({
   const inWindow = inRange(day, window)
 
   const classes = ['day']
-  if (presence) classes.push(inWindow ? 'day--stay' : 'day--stay-out')
+  if (presence) {
+    // Future presence is a booking, not days already spent.
+    if (day > todayNum) classes.push('day--planned')
+    else classes.push(inWindow ? 'day--stay' : 'day--stay-out')
+  }
   if (day === window.start) classes.push('day--wstart')
   if (day === todayNum) classes.push('day--today')
   if (preview && inRange(day, preview)) classes.push('day--preview')
   if (day === pendingStart) classes.push('day--pending')
 
   const dayOfMonth = new Date(day * 86_400_000).getUTCDate()
-  const title = presence ? `${formatDay(day)}: in Schengen` : formatDay(day)
+  const title = presence
+    ? `${formatDay(day)}: ${day > todayNum ? 'planned stay' : 'in Schengen'}`
+    : formatDay(day)
 
   return (
     <button

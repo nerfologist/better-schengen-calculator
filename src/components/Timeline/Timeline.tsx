@@ -89,8 +89,9 @@ export function Timeline({ preview }: TimelineProps) {
       ) : (
         <p className="timeline-hint" role="status">
           <span>
-            Adding a stay starting <strong>{formatDay(pendingStart)}</strong>: now tap the
-            last day (the same day works for a 1-day stay).
+            Adding a {pendingStart > todayNum ? 'planned stay' : 'stay'} starting{' '}
+            <strong>{formatDay(pendingStart)}</strong>: now tap the last day (the same
+            day works for a 1-day stay).
           </span>
           <button type="button" className="btn btn-small" onClick={() => setPendingStart(null)}>
             Cancel
@@ -118,6 +119,9 @@ export function Timeline({ preview }: TimelineProps) {
         </li>
         <li>
           <i className="day-swatch day--stay-out" /> In Schengen (outside window)
+        </li>
+        <li>
+          <i className="day-swatch day--planned" /> Planned stay (booked)
         </li>
         <li>
           <i className="day-swatch day--wstart" /> Window start

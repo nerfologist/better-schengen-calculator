@@ -1,15 +1,24 @@
+import { toDayNum } from '../domain/dates'
 import { useStays } from '../state/StaysContext'
 import { formatDay, formatDayShort } from '../ui/format'
 
 export function SummaryCards() {
-  const { summary } = useStays()
+  const { summary, mergedRanges, today } = useStays()
   const { used, remaining, window, latestExitIfEnteringToday } = summary
+  const todayNum = toDayNum(today)
+  const plannedDays = mergedRanges.reduce(
+    (sum, r) => sum + Math.max(0, r.end - Math.max(r.start, todayNum + 1) + 1),
+    0,
+  )
 
   return (
     <section className="cards" aria-label="Summary">
       <div className="card">
         <span className="card-value">{used}</span>
-        <span className="card-label">days used in the last 180</span>
+        <span className="card-label">
+          days used in the last 180
+          {plannedDays > 0 ? `, plus ${plannedDays} booked ahead` : ''}
+        </span>
       </div>
       <div className="card">
         <span className={`card-value ${remaining === 0 ? 'is-danger' : ''}`}>

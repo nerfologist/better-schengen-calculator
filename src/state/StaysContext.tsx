@@ -12,7 +12,7 @@ import {
   findHistoricalViolations,
   type Summary,
 } from '../domain/schengen'
-import { mergedRangesOf } from '../domain/stays'
+import { mergeStayInto, mergedRangesOf } from '../domain/stays'
 import type { DayRange, Stay } from '../domain/types'
 import { load, requestPersistence, save } from '../storage/staysRepo'
 
@@ -25,9 +25,13 @@ type Action =
 function reducer(stays: Stay[], action: Action): Stay[] {
   switch (action.type) {
     case 'add':
-      return [...stays, { ...action.stay, id: crypto.randomUUID() }]
+      // mergeStayInto keeps the invariant that no day belongs to two stays.
+      return mergeStayInto(stays, { ...action.stay, id: crypto.randomUUID() })
     case 'update':
-      return stays.map((s) => (s.id === action.stay.id ? action.stay : s))
+      return mergeStayInto(
+        stays.filter((s) => s.id !== action.stay.id),
+        action.stay,
+      )
     case 'remove':
       return stays.filter((s) => s.id !== action.id)
     case 'replaceAll':
