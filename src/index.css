@@ -366,6 +366,34 @@ a {
   min-height: 44px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.tool summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Disclosure chevron: down when closed, up when open. */
+.tool summary::after {
+  content: '';
+  width: 0.5em;
+  height: 0.5em;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-25%) rotate(45deg);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.tool[open] > summary::after {
+  transform: translateY(25%) rotate(225deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool summary::after {
+    transition: none;
+  }
 }
 
 .tool-body {
