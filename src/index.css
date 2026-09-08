@@ -86,11 +86,22 @@ a {
   color: var(--accent);
 }
 
-/* Summary cards */
+/* Summary cards: pinned to the top edge while the user scrolls. */
 .cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
+  position: sticky;
+  top: env(safe-area-inset-top, 0);
+  z-index: 5;
+  background: var(--bg);
+  padding: 0.5rem 0;
+  margin: -0.5rem 0;
+}
+
+/* While a tap-to-add selection is active, the hint bar owns the top edge. */
+.app:has(.timeline-hint) .cards {
+  position: static;
 }
 
 @media (min-width: 640px) {
