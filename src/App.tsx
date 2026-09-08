@@ -39,6 +39,8 @@ export default function App() {
         </div>
       )}
 
+      <StayList />
+
       <SummaryCards />
       <Timeline preview={proposedPreview ?? maxPreview} />
 
@@ -47,8 +49,6 @@ export default function App() {
         <MaxStayTool onPreview={onMaxPreview} />
         <ProposedStayTool onPreview={onProposedPreview} />
       </section>
-
-      <StayList />
 
       <footer className="app-footer">
         <ExportImport />
