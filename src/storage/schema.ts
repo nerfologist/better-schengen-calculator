@@ -33,7 +33,17 @@ export function migrate(raw: unknown): PersistedV1 {
       if (!Array.isArray(v.stays) || !v.stays.every(isStay)) {
         throw new Error('Invalid stays payload')
       }
-      return { version: 1, stays: v.stays }
+      // Keep only known fields so imported files can't smuggle extra data
+      // into localStorage.
+      return {
+        version: 1,
+        stays: v.stays.map(({ id, entry, exit, label }) => ({
+          id,
+          entry,
+          exit,
+          ...(label !== undefined ? { label } : {}),
+        })),
+      }
     }
     default:
       throw new Error(`Unknown schema version: ${String(v.version)}`)

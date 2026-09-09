@@ -21,9 +21,12 @@ declare global {
 export function initAnalytics(): void {
   if (!SITE_CODE || !import.meta.env.PROD) return
 
+  // count.js is vendored in public/ (originally from https://gc.zgo.at/count.js)
+  // so no third-party code runs on the page and the CSP can restrict scripts
+  // to 'self'. Refresh the vendored copy occasionally.
   const script = document.createElement('script')
   script.async = true
-  script.src = 'https://gc.zgo.at/count.js'
+  script.src = '/count.js'
   script.dataset.goatcounter = `https://${SITE_CODE}.goatcounter.com/count`
   document.head.appendChild(script)
 

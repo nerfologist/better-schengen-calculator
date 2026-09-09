@@ -9,6 +9,17 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="theme-color" content="#1c2a4a" />
+    <!--
+      GitHub Pages cannot send security headers, so the CSP ships as a meta
+      tag. Everything is same-origin except the analytics beacon
+      (navigator.sendBeacon to GoatCounter). frame-ancestors and sandbox are
+      not supported in meta CSPs; there is no way to prevent framing here.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://nerfologist.goatcounter.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <meta name="referrer" content="no-referrer" />
     <meta
       name="description"
       content="Free Schengen 90/180-day calculator that remembers your stays. See your days used and remaining on a calendar timeline, find the latest exit date, and check if a planned trip complies with the Schengen visa rule."
