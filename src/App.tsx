@@ -85,7 +85,7 @@ export default function App() {
           <a href="https://github.com/nerfologist" target="_blank" rel="noreferrer">
             nerfologist
           </a>
-          .
+          . © 2026, all rights reserved.
         </p>
       </footer>
     </div>
