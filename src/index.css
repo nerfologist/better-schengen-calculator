@@ -747,6 +747,10 @@ input[type='text'] {
   gap: 0.75rem;
 }
 
+.app-credits {
+  text-align: center;
+}
+
 .export-import {
   display: flex;
   gap: 0.5rem;

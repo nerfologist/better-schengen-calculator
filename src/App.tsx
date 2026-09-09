@@ -80,7 +80,7 @@ export default function App() {
           </a>{' '}
           and the authorities of the country you visit.
         </p>
-        <p className="muted">
+        <p className="muted app-credits">
           Made by{' '}
           <a href="https://github.com/nerfologist" target="_blank" rel="noreferrer">
             nerfologist
