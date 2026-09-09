@@ -92,7 +92,15 @@ export default function App() {
           <a href="https://github.com/nerfologist" target="_blank" rel="noreferrer">
             nerfologist
           </a>
-          . © 2026, all rights reserved.
+          . © 2026, all rights reserved. Is this tool useful to you?{' '}
+          <a
+            href="https://buymeacoffee.com/nerfologist"
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => track('donate-clicked')}
+          >
+            ☕ Buy me a coffee
+          </a>
         </p>
       </footer>
     </div>
