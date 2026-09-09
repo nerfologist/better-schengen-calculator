@@ -37,7 +37,8 @@ export default function App() {
       <header className="app-header">
         <h1>Schengen Days</h1>
         <p className="muted">
-          Track your short stays under the 90-days-in-any-180-days rule.{' '}
+          A free Schengen calculator that remembers your short stays under the
+          90-days-in-any-180-days rule.{' '}
           <button type="button" className="link-button" onClick={openFaq}>
             How does the rule work?
           </button>

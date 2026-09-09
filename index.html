@@ -11,9 +11,90 @@
     <meta name="theme-color" content="#1c2a4a" />
     <meta
       name="description"
-      content="Track your Schengen short stays and plan trips under the 90/180-day rule."
+      content="Free Schengen 90/180-day calculator that remembers your stays. See your days used and remaining on a calendar timeline, find the latest exit date, and check if a planned trip complies with the Schengen visa rule."
     />
-    <title>Schengen Days</title>
+    <link rel="canonical" href="https://schengen-days.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Schengen Days" />
+    <meta property="og:title" content="Schengen Days: 90/180 Schengen Calculator" />
+    <meta
+      property="og:description"
+      content="Free Schengen 90/180-day calculator that remembers your stays, shows them on a timeline, and checks your planned trips."
+    />
+    <meta property="og:url" content="https://schengen-days.com/" />
+    <meta property="og:image" content="https://schengen-days.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Schengen Days: 90/180 Schengen Calculator" />
+    <meta
+      name="twitter:description"
+      content="Free Schengen 90/180-day calculator that remembers your stays, shows them on a timeline, and checks your planned trips."
+    />
+    <meta name="twitter:image" content="https://schengen-days.com/og-image.png" />
+    <title>Schengen Days: 90/180 Schengen Calculator</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "Schengen Days",
+            "url": "https://schengen-days.com/",
+            "description": "Free Schengen 90/180-day short-stay calculator that remembers your stays on-device, shows them on a calendar timeline, computes the latest exit date for an entry date, and checks whether a planned trip complies with the rule.",
+            "applicationCategory": "TravelApplication",
+            "operatingSystem": "Any",
+            "browserRequirements": "Requires JavaScript",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is the Schengen 90/180 rule?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "As a visitor to the Schengen area, you may be inside it for at most 90 days within any 180-day period."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What does \"any 180-day period\" mean?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "It is a moving window, not a fixed calendar period. On every single day of a visit, look back at the last 180 days (that day included) and count how many of them you spent in the Schengen area. That count must never go above 90. Because the window moves forward one day at a time, each old travel day stops counting exactly 180 days after it happened."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Do arrival and departure days count?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. The day you enter and the day you leave both count as full days in the Schengen area, even if you arrive five minutes before midnight."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Do my Schengen days reset when I leave?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. Leaving does not reset anything. Each day you spent inside keeps counting against you until it slides out of the back of the 180-day window. This is why \"90 days in, 90 days out\" works: after 90 full days outside, your old days have aged enough to allow a new full stay."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Who does the 90/180 rule apply to?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Non-EU nationals visiting the Schengen area visa-free or on a short-stay (type C) visa. It does not apply to holders of residence permits or long-stay national visas for a Schengen country. Note that the Schengen area is not the same as the EU: for example, Ireland is in the EU but not in Schengen, while Norway, Iceland, Switzerland and Liechtenstein are in Schengen but not in the EU."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
