@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { track } from '../../analytics/goatcounter'
 import { toDayNum, toIso, type DayNum } from '../../domain/dates'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
@@ -51,6 +52,7 @@ export function Timeline({ preview }: TimelineProps) {
           type: 'add',
           stay: { entry: toIso(confirmRange.start), exit: toIso(confirmRange.end), label },
         })
+        track('stay-added-tap')
       }
       setConfirmRange(null)
     },

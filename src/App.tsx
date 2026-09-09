@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { track } from './analytics/goatcounter'
 import { ExportImport } from './components/ExportImport'
 import { FaqDialog } from './components/FaqDialog'
 import { StayList } from './components/StayList'
@@ -18,6 +19,10 @@ export default function App() {
   const [maxRecap, setMaxRecap] = useState<PlanRecap | null>(null)
   const [proposedRecap, setProposedRecap] = useState<PlanRecap | null>(null)
   const [faqOpen, setFaqOpen] = useState(false)
+  const openFaq = useCallback(() => {
+    setFaqOpen(true)
+    track('faq-opened')
+  }, [])
 
   const onMaxPreview = useCallback((r: DayRange | null) => setMaxPreview(r), [])
   const onProposedPreview = useCallback(
@@ -33,7 +38,7 @@ export default function App() {
         <h1>Schengen Days</h1>
         <p className="muted">
           Track your short stays under the 90-days-in-any-180-days rule.{' '}
-          <button type="button" className="link-button" onClick={() => setFaqOpen(true)}>
+          <button type="button" className="link-button" onClick={openFaq}>
             How does the rule work?
           </button>
         </p>
@@ -67,7 +72,7 @@ export default function App() {
         <p className="muted">
           Data is stored only on this device. This tool is informational and not
           legal advice: read{' '}
-          <button type="button" className="link-button" onClick={() => setFaqOpen(true)}>
+          <button type="button" className="link-button" onClick={openFaq}>
             how the 90/180 rule works
           </button>
           , and verify with the{' '}
@@ -78,7 +83,9 @@ export default function App() {
           >
             official EU calculator
           </a>{' '}
-          and the authorities of the country you visit.
+          and the authorities of the country you visit. Anonymous, cookie-free
+          usage statistics are collected; your travel data never leaves your
+          device.
         </p>
         <p className="muted app-credits">
           Made by{' '}

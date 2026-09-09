@@ -41,6 +41,13 @@ npm run build      # type-check + production build with PWA assets
 npm run preview    # serve the production build
 ```
 
+## Analytics
+
+Anonymous, cookieless usage analytics via [GoatCounter](https://www.goatcounter.com)
+(pageviews plus feature-usage events; stay data never leaves the device).
+Disabled until `SITE_CODE` in `src/analytics/goatcounter.ts` is set to the
+site code of a GoatCounter account, and always disabled in dev builds.
+
 ## Deployment
 
 Every push to `main` runs tests and a build check (`ci.yml`). Deployment to

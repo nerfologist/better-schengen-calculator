@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { track } from '../../analytics/goatcounter'
 import { isValidIso, toDayNum } from '../../domain/dates'
 import { checkStay } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
@@ -29,6 +30,14 @@ export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) 
     () => (range ? checkStay(mergedRanges, range.start, range.end) : null),
     [mergedRanges, range],
   )
+
+  const usageTracked = useRef(false)
+  useEffect(() => {
+    if (result && !usageTracked.current) {
+      usageTracked.current = true
+      track('proposed-stay-tool-used')
+    }
+  }, [result])
 
   useEffect(() => {
     onPreview(range)

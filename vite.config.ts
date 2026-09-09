@@ -4,12 +4,13 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // Must match the GitHub repo name for GitHub Pages hosting. Dev serves at
-// the root for convenience; only built output uses the Pages subpath.
+// the root for convenience; builds use the Pages subpath, and preview must
+// match the built output (vite preview also runs with command 'serve').
 const PAGES_BASE = '/better-schengen-calculator/'
 
 // https://vite.dev/config/
-export default defineConfig(({ command }) => ({
-  base: command === 'build' ? PAGES_BASE : '/',
+export default defineConfig(({ command, isPreview }) => ({
+  base: command === 'build' || isPreview ? PAGES_BASE : '/',
   plugins: [
     react(),
     VitePWA({

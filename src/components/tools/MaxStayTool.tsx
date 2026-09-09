@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { track } from '../../analytics/goatcounter'
 import { isValidIso, toDayNum } from '../../domain/dates'
 import { latestExit } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
@@ -22,6 +23,14 @@ export function MaxStayTool({ onPreview, onRecap }: MaxStayToolProps) {
     () => (isValidIso(entry) ? latestExit(mergedRanges, toDayNum(entry)) : null),
     [mergedRanges, entry],
   )
+
+  const usageTracked = useRef(false)
+  useEffect(() => {
+    if (result && !usageTracked.current) {
+      usageTracked.current = true
+      track('max-stay-tool-used')
+    }
+  }, [result])
 
   useEffect(() => {
     onPreview(

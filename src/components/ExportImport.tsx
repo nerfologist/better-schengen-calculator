@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { track } from '../analytics/goatcounter'
 import { useStays } from '../state/StaysContext'
 import { exportJson, importJson } from '../storage/staysRepo'
 
@@ -15,6 +16,7 @@ export function ExportImport() {
     a.download = 'schengen-stays.json'
     a.click()
     URL.revokeObjectURL(url)
+    track('backup-exported')
   }
 
   async function doImport(file: File) {
@@ -30,6 +32,7 @@ export function ExportImport() {
       }
       dispatch({ type: 'replaceAll', stays: imported })
       setMessage(`Imported ${imported.length} stay(s).`)
+      track('backup-imported')
     } catch (e) {
       setMessage(e instanceof Error ? e.message : 'Import failed')
     }

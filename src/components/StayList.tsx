@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { track } from '../analytics/goatcounter'
 import { toDayNum } from '../domain/dates'
 import type { Stay } from '../domain/types'
 import { useStays } from '../state/StaysContext'
@@ -89,7 +90,12 @@ export function StayList() {
         </>
       )}
       <h3 className="add-stay-title">Add a stay</h3>
-      <StayForm onSave={(stay) => dispatch({ type: 'add', stay })} />
+      <StayForm
+        onSave={(stay) => {
+          dispatch({ type: 'add', stay })
+          track('stay-added-form')
+        }}
+      />
     </section>
   )
 }
