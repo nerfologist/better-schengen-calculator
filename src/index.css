@@ -583,6 +583,14 @@ a {
   margin-top: 1.25rem;
 }
 
+/* Donation nudge under a positive planning result */
+.coffee-nudge {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: right;
+}
+
 /* Forms */
 label {
   display: flex;

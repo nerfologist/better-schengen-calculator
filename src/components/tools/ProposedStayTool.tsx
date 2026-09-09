@@ -6,6 +6,7 @@ import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
 import { formatDay, formatDayShort } from '../../ui/format'
 import { usePersistedInput } from '../../ui/usePersistedInput'
+import { CoffeeNudge } from '../CoffeeNudge'
 import type { PlanRecap } from './recap'
 
 export interface ProposedStayToolProps {
@@ -101,10 +102,13 @@ export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) 
           )}
         </div>
         {range && result?.compliant && (
-          <p className="tool-result is-ok" role="status">
-            <strong>Compliant.</strong> This trip peaks at{' '}
-            <strong>{result.peakUsage}/90</strong> days used.
-          </p>
+          <>
+            <p className="tool-result is-ok" role="status">
+              <strong>Compliant.</strong> This trip peaks at{' '}
+              <strong>{result.peakUsage}/90</strong> days used.
+            </p>
+            <CoffeeNudge placement="proposed-stay" />
+          </>
         )}
         {range && result && !result.compliant && (
           <p className="tool-result is-bad" role="status">

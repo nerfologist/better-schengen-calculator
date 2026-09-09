@@ -6,6 +6,7 @@ import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
 import { usePersistedInput } from '../../ui/usePersistedInput'
 import { formatDay, formatDayShort } from '../../ui/format'
+import { CoffeeNudge } from '../CoffeeNudge'
 import type { PlanRecap } from './recap'
 
 export interface MaxStayToolProps {
@@ -85,10 +86,13 @@ export function MaxStayTool({ onPreview, onRecap }: MaxStayToolProps) {
           )}
         </div>
         {result && result.ok && (
-          <p className="tool-result is-ok" role="status">
-            You can stay <strong>{result.stayLength} days</strong>, until{' '}
-            <strong>{formatDay(result.exitDay)}</strong> (included).
-          </p>
+          <>
+            <p className="tool-result is-ok" role="status">
+              You can stay <strong>{result.stayLength} days</strong>, until{' '}
+              <strong>{formatDay(result.exitDay)}</strong> (included).
+            </p>
+            <CoffeeNudge placement="max-stay" />
+          </>
         )}
         {result && !result.ok && result.reason === 'entry-day-not-compliant' && (
           <p className="tool-result is-bad" role="status">
