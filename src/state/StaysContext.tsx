@@ -4,6 +4,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useState,
   type ReactNode,
 } from 'react'
 import { todayIso, toDayNum } from '../domain/dates'
@@ -45,6 +46,8 @@ interface StaysValue {
   summary: Summary
   violations: ReturnType<typeof findHistoricalViolations>
   today: string
+  /** True when the latest write to on-device storage was refused. */
+  saveFailed: boolean
   dispatch: (action: Action) => void
 }
 
@@ -52,10 +55,14 @@ const StaysContext = createContext<StaysValue | null>(null)
 
 export function StaysProvider({ children }: { children: ReactNode }) {
   const [stays, dispatch] = useReducer(reducer, undefined, () => load())
+  const [saveFailed, setSaveFailed] = useState(false)
 
   useEffect(() => {
-    save(stays)
-    if (stays.length > 0) requestPersistence()
+    const saved = save(stays)
+    // Storage is an external system: the write result is only known here.
+    // oxlint-disable-next-line react/set-state-in-effect
+    setSaveFailed(!saved)
+    if (saved && stays.length > 0) requestPersistence()
   }, [stays])
 
   const today = todayIso()
@@ -67,9 +74,10 @@ export function StaysProvider({ children }: { children: ReactNode }) {
       summary: computeSummary(mergedRanges, toDayNum(today)),
       violations: findHistoricalViolations(mergedRanges),
       today,
+      saveFailed,
       dispatch,
     }
-  }, [stays, today])
+  }, [stays, today, saveFailed])
 
   return <StaysContext.Provider value={value}>{children}</StaysContext.Provider>
 }

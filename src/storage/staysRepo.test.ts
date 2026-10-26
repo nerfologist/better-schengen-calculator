@@ -26,8 +26,36 @@ const stays: Stay[] = [
 describe('staysRepo', () => {
   it('round-trips stays through save/load', () => {
     const storage = memoryStorage()
-    save(stays, storage)
+    expect(save(stays, storage)).toBe(true)
     expect(load(storage)).toEqual(stays)
+  })
+
+  it('reports a failed save without throwing', () => {
+    const storage = memoryStorage()
+    storage.setItem = () => {
+      throw new Error('QuotaExceededError')
+    }
+    expect(save(stays, storage)).toBe(false)
+  })
+
+  it('survives storage access being blocked', () => {
+    const blockedRead = memoryStorage()
+    blockedRead.getItem = () => {
+      throw new Error('SecurityError')
+    }
+    expect(load(blockedRead)).toEqual([])
+
+    const blockedQuarantine = memoryStorage()
+    blockedQuarantine.getItem = () => '{broken json'
+    blockedQuarantine.setItem = () => {
+      throw new Error('QuotaExceededError')
+    }
+    expect(load(blockedQuarantine)).toEqual([])
+  })
+
+  it('never throws when localStorage is unavailable', () => {
+    expect(save(stays, null)).toBe(false)
+    expect(load(null)).toEqual([])
   })
 
   it('returns empty on first run', () => {

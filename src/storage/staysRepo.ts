@@ -6,26 +6,64 @@ function pack(stays: Stay[]): PersistedV1 {
   return { version: 1, stays }
 }
 
-export function load(storage: Storage = localStorage): Stay[] {
-  const raw = storage.getItem(STORAGE_KEY)
+/**
+ * localStorage itself can throw when site data is blocked (some private modes,
+ * embedded webviews), even before getItem/setItem is called.
+ */
+function defaultStorage(): Storage | null {
+  try {
+    return typeof localStorage === 'undefined' ? null : localStorage
+  } catch {
+    return null
+  }
+}
+
+export function load(storage: Storage | null = defaultStorage()): Stay[] {
+  if (!storage) return []
+  let raw: string | null
+  try {
+    raw = storage.getItem(STORAGE_KEY)
+  } catch {
+    return []
+  }
   if (raw === null) return []
   try {
     return migrate(JSON.parse(raw)).stays
   } catch {
     // Never silently destroy data: keep the unreadable payload aside.
-    storage.setItem(CORRUPT_KEY, raw)
+    try {
+      storage.setItem(CORRUPT_KEY, raw)
+    } catch {
+      // Quarantine is best effort; the original value is still in place.
+    }
     return []
   }
 }
 
-export function save(stays: Stay[], storage: Storage = localStorage): void {
-  storage.setItem(STORAGE_KEY, JSON.stringify(pack(stays)))
+/** Returns false when the device refused the write (quota, blocked storage). */
+export function save(
+  stays: Stay[],
+  storage: Storage | null = defaultStorage(),
+): boolean {
+  if (!storage) return false
+  try {
+    storage.setItem(STORAGE_KEY, JSON.stringify(pack(stays)))
+    return true
+  } catch {
+    return false
+  }
 }
 
 /** Best-effort request to exempt this origin from storage eviction. */
 export function requestPersistence(): void {
-  if (typeof navigator !== 'undefined' && navigator.storage?.persist) {
-    void navigator.storage.persist()
+  try {
+    if (typeof navigator !== 'undefined' && navigator.storage?.persist) {
+      void navigator.storage.persist().catch(() => {
+        // Persistence is optional; the app still works without it.
+      })
+    }
+  } catch {
+    // Ignore environments that expose a partial StorageManager.
   }
 }
 

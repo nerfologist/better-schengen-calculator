@@ -13,7 +13,7 @@ import { useStays } from './state/StaysContext'
 import { formatDayShort } from './ui/format'
 
 export default function App() {
-  const { violations } = useStays()
+  const { violations, saveFailed } = useStays()
   const [maxPreview, setMaxPreview] = useState<DayRange | null>(null)
   const [proposedPreview, setProposedPreview] = useState<DayRange | null>(null)
   const [maxRecap, setMaxRecap] = useState<PlanRecap | null>(null)
@@ -52,6 +52,13 @@ export default function App() {
             .map((v) => `${formatDayShort(v.start)} (peak ${v.peak}/90)`)
             .join(', ')}
           . Double-check the dates you entered.
+        </div>
+      )}
+
+      {saveFailed && (
+        <div className="banner-danger" role="alert">
+          Your stays can't be saved on this device: storage is full or blocked.
+          Export a backup before closing this tab.
         </div>
       )}
 
