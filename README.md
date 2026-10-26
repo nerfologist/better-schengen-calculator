@@ -18,6 +18,9 @@ shows your situation on a calendar timeline.
   when it breaks and by how much). Planned stays already recorded in the
   future are taken into account.
 - **PWA**: installable on a phone's home screen, fully offline-capable.
+- **Local-only by default**: stays never leave the device. A **Delete all data**
+  button removes stays, quarantined payloads, and planning inputs; see the
+  [privacy note](https://schengen-days.com/privacy.html).
 
 ## The rule
 
@@ -35,23 +38,37 @@ construction.
 
 ```sh
 npm install
-npm run dev        # dev server
-npm test           # vitest watch mode (npm test -- --run for one pass)
-npm run build      # type-check + production build with PWA assets
-npm run preview    # serve the production build
+npm run dev             # dev server
+npm run lint            # oxlint
+npm test                # vitest watch mode (npm test -- --run for one pass)
+npm run build           # type-check + production build with PWA assets
+npm run preview         # serve the production build
+npm run size            # enforce gzipped JS/CSS budgets for dist/assets
+npm run verify:vendor   # check public/count.js against its pinned SHA-384
 ```
 
 ## Analytics
 
 Anonymous, cookieless usage analytics via [GoatCounter](https://www.goatcounter.com)
 (pageviews plus feature-usage events; stay data never leaves the device).
-Disabled until `SITE_CODE` in `src/analytics/goatcounter.ts` is set to the
-site code of a GoatCounter account, and always disabled in dev builds.
+`src/analytics/config.ts` holds the site code; set it to the code of a
+GoatCounter account, or leave it empty to disable analytics. The CSP in both
+the meta tag and the generated `_headers` derives the allowed origin from that
+same value.
+
+`public/count.js` is vendored and loaded with a SHA-384 integrity attribute
+pinned in `src/analytics/vendor.ts`. `npm run verify:vendor` (also run in CI)
+fails if the two drift. Analytics is always disabled in dev builds. The
+[privacy note](public/privacy.html) documents what the endpoint receives and
+the `#toggle-goatcounter` opt-out.
 
 ## Deployment
 
-Every push to `main` runs tests and a build check (`ci.yml`). Deployment to
-GitHub Pages happens only when a release is published (`deploy.yml`), e.g.:
+Every push to `main` and every pull request runs lint, the dependency audit,
+the vendored-script check, tests, the production build, and the bundle-size
+budget (`ci.yml`). Pull requests also get a dependency review. Deployment to
+GitHub Pages happens only when a release is published (`deploy.yml`); manual
+`workflow_dispatch` deploys are restricted to `main`, e.g.:
 
 ```sh
 gh release create v0.2.0 --generate-notes
@@ -63,6 +80,12 @@ served at https://schengen-days.com (custom domain configured in the repo's
 Pages settings; DNS on Cloudflare, proxy off, apex A records to the GitHub
 Pages IPs plus a www CNAME to nerfologist.github.io). In the repo settings,
 set Pages > Source to "GitHub Actions".
+
+The build emits `dist/_headers` with `frame-ancestors`, HSTS, `nosniff`,
+`Permissions-Policy`, COOP, and cache rules. GitHub Pages ignores it, so the
+meta CSP in `index.html` remains the active policy. To apply the stronger
+header policy, put Cloudflare in front of Pages or deploy the same `dist` to
+Cloudflare Pages; see [`deploy/cloudflare/README.md`](deploy/cloudflare/README.md).
 
 ## Disclaimer
 
