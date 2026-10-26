@@ -4,6 +4,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -15,7 +16,8 @@ import {
 } from '../domain/schengen'
 import { mergeStayInto, mergedRangesOf } from '../domain/stays'
 import type { DayRange, Stay } from '../domain/types'
-import { load, requestPersistence, save } from '../storage/staysRepo'
+import { exportJson, load, requestPersistence, save } from '../storage/staysRepo'
+import { STORAGE_KEY } from '../storage/schema'
 
 type Action =
   | { type: 'add'; stay: Omit<Stay, 'id'> }
@@ -56,14 +58,40 @@ const StaysContext = createContext<StaysValue | null>(null)
 export function StaysProvider({ children }: { children: ReactNode }) {
   const [stays, dispatch] = useReducer(reducer, undefined, () => load())
   const [saveFailed, setSaveFailed] = useState(false)
+  // Signature of the last payload this tab read or wrote, and a flag that
+  // suppresses writing a remote change straight back (which would ping-pong
+  // between tabs).
+  const lastSeen = useRef<string | null>(null)
+  const applyingRemote = useRef(false)
 
   useEffect(() => {
+    if (applyingRemote.current) {
+      applyingRemote.current = false
+      return
+    }
     const saved = save(stays)
+    if (saved) lastSeen.current = exportJson(stays)
     // Storage is an external system: the write result is only known here.
     // oxlint-disable-next-line react/set-state-in-effect
     setSaveFailed(!saved)
     if (saved && stays.length > 0) requestPersistence()
   }, [stays])
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== STORAGE_KEY) return
+      // Read the live value rather than e.newValue: a queued event can carry
+      // an older payload than the one currently stored.
+      const incoming = load()
+      const signature = exportJson(incoming)
+      if (signature === lastSeen.current) return
+      lastSeen.current = signature
+      applyingRemote.current = true
+      dispatch({ type: 'replaceAll', stays: incoming })
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
 
   const today = todayIso()
   const value = useMemo<StaysValue>(() => {
