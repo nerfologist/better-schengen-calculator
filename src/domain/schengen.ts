@@ -49,9 +49,16 @@ function firstNewFutureViolation(
   baseline: DayRange[],
   afterDay: DayNum,
 ): DayNum | null {
+  // Presence added on or before afterDay can only affect windows ending up to
+  // WINDOW_DAYS - 1 days later. Days beyond that are pure baseline presence:
+  // combined and baseline are identical there, so no new violation is possible.
+  // Stopping here keeps a far-future recorded stay from forcing a scan of
+  // millions of days, without changing the result.
+  const lastRelevantDay = afterDay + WINDOW_DAYS - 1
   for (const r of baseline) {
     if (r.end <= afterDay) continue
-    for (let d = Math.max(r.start, afterDay + 1); d <= r.end; d++) {
+    const end = Math.min(r.end, lastRelevantDay)
+    for (let d = Math.max(r.start, afterDay + 1); d <= end; d++) {
       if (
         presenceInWindow(combined, d) > MAX_STAY_DAYS &&
         presenceInWindow(baseline, d) <= MAX_STAY_DAYS

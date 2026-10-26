@@ -152,6 +152,20 @@ describe('latestExit', () => {
       stayLength: 90,
     })
   })
+
+  it('does not scan a far-future stay beyond the 180-day horizon', () => {
+    // The recorded stay starts 8 months after entry and runs for years. Its
+    // own overstay is pre-existing, so it must neither be reported as a new
+    // conflict nor cause the planner to walk its entire length day by day.
+    // The 90-day stay from Jan 1 ends before the window can reach Sep 1.
+    const merged = history(['2026-09-01', '2035-12-31'])
+    const result = latestExit(merged, d('2026-01-01'))
+    expect(result).toEqual({
+      ok: true,
+      exitDay: d('2026-03-31'),
+      stayLength: 90,
+    })
+  })
 })
 
 describe('checkStay', () => {
