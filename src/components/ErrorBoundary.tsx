@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { CORRUPT_KEY, STORAGE_KEY } from '../storage/schema'
+import { clearAllData } from '../storage/staysRepo'
 
 interface Props {
   children: ReactNode
@@ -54,17 +55,14 @@ export class ErrorBoundary extends Component<Props, State> {
   private reset = () => {
     if (
       !window.confirm(
-        'Delete all stays stored on this device? Download a copy first if you need it. This cannot be undone.',
+        'Delete all stays and planning dates stored on this device? Download a copy first if you need it. This cannot be undone.',
       )
     ) {
       return
     }
-    try {
-      localStorage.removeItem(STORAGE_KEY)
-      localStorage.removeItem(CORRUPT_KEY)
-    } catch {
-      // Nothing else can be done if storage itself is blocked.
-    }
+    // clearAllData also removes PLAN_KEYS and the quarantined payload, and
+    // tolerates storage being blocked.
+    clearAllData()
     window.location.reload()
   }
 
