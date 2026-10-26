@@ -12,6 +12,7 @@ export interface DayCellProps {
   isWindowStart: boolean
   isPreview: boolean
   isPending: boolean
+  isSelecting: boolean
   onTap: (day: DayNum) => void
 }
 
@@ -30,6 +31,7 @@ export const DayCell = memo(function DayCell({
   isWindowStart,
   isPreview,
   isPending,
+  isSelecting,
   onTap,
 }: DayCellProps) {
   const classes = ['day']
@@ -54,7 +56,11 @@ export const DayCell = memo(function DayCell({
       className={classes.join(' ')}
       title={title}
       data-day={day}
-      aria-label={`${label}: add or select a stay`}
+      aria-label={
+        isSelecting
+          ? `${label}: tap to end the stay here`
+          : `${label}: tap to start adding a stay`
+      }
       onClick={() => onTap(day)}
     >
       {dayOfMonth}

@@ -67,6 +67,7 @@ export function MonthGrid({
               isWindowStart={day === window.start}
               isPreview={preview !== null && inRange(day, preview)}
               isPending={day === pendingStart}
+              isSelecting={pendingStart !== null}
               onTap={onTap}
             />
           ),
