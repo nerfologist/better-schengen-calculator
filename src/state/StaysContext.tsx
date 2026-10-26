@@ -145,6 +145,8 @@ export function StaysProvider({ children }: { children: ReactNode }) {
   return <StaysContext.Provider value={value}>{children}</StaysContext.Provider>
 }
 
+// The context and its hook intentionally live together.
+// oxlint-disable-next-line react/only-export-components
 export function useStays(): StaysValue {
   const value = useContext(StaysContext)
   if (!value) throw new Error('useStays must be used inside StaysProvider')
