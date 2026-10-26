@@ -18,6 +18,23 @@ export const MAX_STAYS = 200
 export const MAX_LABEL_LENGTH = 60
 export const MAX_IMPORT_BYTES = 1_000_000
 
+/** Control characters and bidi overrides that can visually spoof the UI. */
+export const UNSAFE_TEXT = /[\p{Cc}\u202A-\u202E\u2066-\u2069]/u
+
+export function isSafeId(id: string): boolean {
+  return id.length > 0 && id.length <= 64 && !UNSAFE_TEXT.test(id)
+}
+
+export function isSafeLabel(label: string): boolean {
+  return label.length <= MAX_LABEL_LENGTH && !UNSAFE_TEXT.test(label)
+}
+
+/** Strip unsafe formatting characters and normalise an optional label. */
+export function cleanLabel(label: string): string | undefined {
+  const cleaned = label.replace(UNSAFE_TEXT, '').trim().slice(0, MAX_LABEL_LENGTH)
+  return cleaned || undefined
+}
+
 /** Caller must pass dates that already passed isValidIso(). */
 export function isSupportedStay(entry: IsoDate, exit: IsoDate): boolean {
   const start = toDayNum(entry)

@@ -1,7 +1,8 @@
 import { isValidIso } from '../domain/dates'
 import {
-  MAX_LABEL_LENGTH,
   MAX_STAYS,
+  isSafeId,
+  isSafeLabel,
   isSupportedStay,
 } from '../domain/limits'
 import type { Stay } from '../domain/types'
@@ -16,9 +17,6 @@ export const PLAN_KEYS = {
   proposedEnd: 'schengen-calc:plan.proposedEnd',
 } as const
 
-/** Control characters and bidi overrides that can visually spoof the UI. */
-const UNSAFE_TEXT = /[\p{Cc}\u202A-\u202E\u2066-\u2069]/u
-
 export interface PersistedV1 {
   version: 1
   stays: Stay[]
@@ -27,25 +25,12 @@ export interface PersistedV1 {
 export function isStay(value: unknown): value is Stay {
   if (typeof value !== 'object' || value === null) return false
   const v = value as Record<string, unknown>
-  if (
-    typeof v.id !== 'string' ||
-    v.id.length === 0 ||
-    v.id.length > 64 ||
-    UNSAFE_TEXT.test(v.id)
-  ) {
-    return false
-  }
+  if (typeof v.id !== 'string' || !isSafeId(v.id)) return false
   if (typeof v.entry !== 'string' || !isValidIso(v.entry)) return false
   if (typeof v.exit !== 'string' || !isValidIso(v.exit)) return false
   if (!isSupportedStay(v.entry, v.exit)) return false
   if (v.label !== undefined) {
-    if (
-      typeof v.label !== 'string' ||
-      v.label.length > MAX_LABEL_LENGTH ||
-      UNSAFE_TEXT.test(v.label)
-    ) {
-      return false
-    }
+    if (typeof v.label !== 'string' || !isSafeLabel(v.label)) return false
   }
   return true
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { MAX_LABEL_LENGTH } from '../../domain/limits'
+import { MAX_LABEL_LENGTH, cleanLabel } from '../../domain/limits'
 import type { DayRange } from '../../domain/types'
 import { formatDay } from '../../ui/format'
 
@@ -31,7 +31,7 @@ export function ConfirmStayDialog({ range, todayNum, onConfirm, onCancel }: Conf
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    onConfirm(label.trim() || undefined)
+    onConfirm(cleanLabel(label))
   }
 
   return (

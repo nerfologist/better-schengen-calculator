@@ -5,6 +5,7 @@ import {
   MAX_RECORDED_STAY_DAYS,
   MAX_SUPPORTED_ISO,
   MIN_SUPPORTED_ISO,
+  cleanLabel,
   isSupportedStay,
 } from '../domain/limits'
 import type { Stay } from '../domain/types'
@@ -38,7 +39,7 @@ export function StayForm({ initial, onSave, onCancel }: StayFormProps) {
       return
     }
     setError(null)
-    onSave({ entry, exit, label: label.trim() || undefined })
+    onSave({ entry, exit, label: cleanLabel(label) })
     if (!initial) {
       setEntry('')
       setExit('')

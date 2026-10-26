@@ -53,7 +53,11 @@ export function save(
 ): boolean {
   if (!storage) return false
   try {
-    storage.setItem(STORAGE_KEY, JSON.stringify(pack(stays)))
+    // Validate before writing: a merge can theoretically produce a range that
+    // the schema would reject on the next load. Refusing the write keeps the
+    // previous good payload intact and lets the UI warn instead of losing data.
+    const normalized = migrate(pack(stays))
+    storage.setItem(STORAGE_KEY, JSON.stringify(normalized))
     return true
   } catch {
     return false

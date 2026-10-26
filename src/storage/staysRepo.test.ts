@@ -38,6 +38,15 @@ describe('staysRepo', () => {
     expect(save(stays, storage)).toBe(false)
   })
 
+  it('refuses to persist data that the schema would reject on load', () => {
+    const storage = memoryStorage()
+    const tooLong: Stay[] = [
+      { id: 'x', entry: '2026-01-01', exit: '2028-01-01' },
+    ]
+    expect(save(tooLong, storage)).toBe(false)
+    expect(storage.getItem(STORAGE_KEY)).toBeNull()
+  })
+
   it('survives storage access being blocked', () => {
     const blockedRead = memoryStorage()
     blockedRead.getItem = () => {
