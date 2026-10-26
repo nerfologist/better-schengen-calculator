@@ -74,6 +74,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+        // Social-card art is never shown by the app; don't make phones cache it.
+        globIgnores: ['**/og-image.*'],
       },
       manifest: {
         name: 'Schengen Days',
