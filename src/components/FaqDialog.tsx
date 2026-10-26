@@ -52,11 +52,11 @@ const FAQ_ITEMS: { question: string; answer: ReactNode }[] = [
     answer: (
       <p>
         Say you spent all of January and February in the Schengen area, roughly 59 days,
-        then went home. If you come back on June 1st, the window ending on any June day
-        still contains those winter days, so you have only about 31 days available. But
-        every day you wait after the end of July, a January day drops out of the window
-        and gives you a day back. The calculator does exactly this arithmetic for every
-        day of your planned trip.
+        then went home. If you come back on June 1st, the window ending that day still
+        contains those winter days, so there are only about 31 unused days in that
+        window. But those winter days keep aging out as your stay goes on, freeing
+        space, so the longest continuous stay from June 1st is longer than 31 days.
+        The calculator checks every day of your planned trip, including that roll-off.
       </p>
     ),
   },

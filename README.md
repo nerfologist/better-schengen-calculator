@@ -11,8 +11,9 @@ shows your situation on a calendar timeline.
   to move data between devices.
 - **Timeline**: the last 7 months plus the next one, with your stays, the
   rolling 180-day window start, and today highlighted.
-- **Summary**: days used in the current window, days available today, and the
-  latest exit date if you entered today.
+- **Summary**: days used in the current window, the maximum continuous stay if
+  you entered today (accounting for days that roll off the 180-day window), and
+  that stay's latest exit date.
 - **Trip planning**: given an entry date, the latest allowed exit date; given a
   proposed date range, whether it complies with the 90/180 rule (and if not,
   when it breaks and by how much). Planned stays already recorded in the

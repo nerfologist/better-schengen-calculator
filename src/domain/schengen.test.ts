@@ -219,21 +219,39 @@ describe('findHistoricalViolations', () => {
 })
 
 describe('computeSummary', () => {
-  it('combines used/remaining/window/latest-exit for today', () => {
+  it('combines used/headroom/window/latest-exit for today', () => {
     const merged = history(['2026-04-01', '2026-05-30'])
     const today = d('2026-06-15')
     const summary = computeSummary(merged, today)
     expect(summary.used).toBe(60)
-    expect(summary.remaining).toBe(30)
+    expect(summary.windowHeadroom).toBe(30)
+    expect(summary.availableDays).toBe(30)
     expect(summary.window).toEqual(windowFor(today))
     expect(summary.latestExitIfEnteringToday).toBe(d('2026-07-14'))
   })
 
-  it('reports null latest exit when even today is not compliant', () => {
+  it('reports the continuous-stay allowance when old days roll off', () => {
+    // 58 days are in today's window, so fixed-window headroom is 32. A stay
+    // starting today can still last 59 days because the May-June days roll
+    // out of the window before the stay ends.
+    const merged = history(
+      ['2026-05-30', '2026-06-25'],
+      ['2026-08-07', '2026-09-06'],
+    )
+    const today = d('2026-10-26')
+    const summary = computeSummary(merged, today)
+    expect(summary.used).toBe(58)
+    expect(summary.windowHeadroom).toBe(32)
+    expect(summary.availableDays).toBe(59)
+    expect(summary.latestExitIfEnteringToday).toBe(d('2026-12-23'))
+  })
+
+  it('reports no available days when even today is not compliant', () => {
     const today = '2026-09-07'
     const merged = history([addDays(today, -90), addDays(today, -1)]) // 90 days ending yesterday
     const summary = computeSummary(merged, d(today))
     expect(summary.latestExitIfEnteringToday).toBeNull()
+    expect(summary.availableDays).toBe(0)
   })
 })
 

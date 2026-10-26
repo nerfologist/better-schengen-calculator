@@ -9,7 +9,7 @@ export interface SummaryCardsProps {
 
 export function SummaryCards({ recap }: SummaryCardsProps) {
   const { summary, mergedRanges, today } = useStays()
-  const { used, remaining, window, latestExitIfEnteringToday } = summary
+  const { used, availableDays, window, latestExitIfEnteringToday } = summary
   const todayNum = toDayNum(today)
   const plannedDays = mergedRanges.reduce(
     (sum, r) => sum + Math.max(0, r.end - Math.max(r.start, todayNum + 1) + 1),
@@ -26,10 +26,10 @@ export function SummaryCards({ recap }: SummaryCardsProps) {
         </span>
       </div>
       <div className="card">
-        <span className={`card-value ${remaining === 0 ? 'is-danger' : ''}`}>
-          {remaining}
+        <span className={`card-value ${availableDays === 0 ? 'is-danger' : ''}`}>
+          {availableDays}
         </span>
-        <span className="card-label">days available today</span>
+        <span className="card-label">days available if you enter today</span>
       </div>
       <div className="card">
         <span className="card-value card-value-small">

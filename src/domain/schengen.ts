@@ -189,17 +189,21 @@ export function findHistoricalViolations(
 
 export interface Summary {
   used: number
-  remaining: number
+  /** Fixed-window headroom today (90 - used); not the length of a new stay. */
+  windowHeadroom: number
   window: DayRange
   latestExitIfEnteringToday: DayNum | null
+  /** Longest continuous stay starting today, including days that roll off. */
+  availableDays: number
 }
 
 export function computeSummary(merged: DayRange[], todayNum: DayNum): Summary {
   const result = latestExit(merged, todayNum)
   return {
     used: presenceInWindow(merged, todayNum),
-    remaining: daysRemaining(merged, todayNum),
+    windowHeadroom: daysRemaining(merged, todayNum),
     window: windowFor(todayNum),
     latestExitIfEnteringToday: result.ok ? result.exitDay : null,
+    availableDays: result.ok ? result.stayLength : 0,
   }
 }
