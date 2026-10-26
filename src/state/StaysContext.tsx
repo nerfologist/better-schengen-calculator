@@ -93,7 +93,42 @@ export function StaysProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('storage', onStorage)
   }, [])
 
-  const today = todayIso()
+  // Today is state, not a render-time read: an app left open overnight (or
+  // restored from bfcache) must roll its window and summary at midnight.
+  const [today, setToday] = useState(todayIso)
+  useEffect(() => {
+    let timer: number | undefined
+    const refresh = () => {
+      const next = todayIso()
+      setToday((previous) => (previous === next ? previous : next))
+      schedule()
+    }
+    const schedule = () => {
+      window.clearTimeout(timer)
+      const now = new Date()
+      const midnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+      ).getTime()
+      // A small margin avoids firing a hair before the local date changes.
+      timer = window.setTimeout(refresh, Math.max(1000, midnight - now.getTime() + 1000))
+    }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refresh()
+    }
+    schedule()
+    document.addEventListener('visibilitychange', onVisibility)
+    window.addEventListener('pageshow', refresh)
+    window.addEventListener('focus', refresh)
+    return () => {
+      window.clearTimeout(timer)
+      document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('pageshow', refresh)
+      window.removeEventListener('focus', refresh)
+    }
+  }, [])
+
   const value = useMemo<StaysValue>(() => {
     const mergedRanges = mergedRangesOf(stays)
     return {
