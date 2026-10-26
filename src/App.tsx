@@ -57,8 +57,9 @@ export default function App() {
 
       {saveFailed && (
         <div className="banner-danger" role="alert">
-          Your stays can't be saved on this device: storage is full or blocked.
-          Export a backup before closing this tab.
+          Your latest changes couldn't be saved. Storage may be full or blocked,
+          or the data may be outside the supported range. Export a backup before
+          closing this tab.
         </div>
       )}
 
