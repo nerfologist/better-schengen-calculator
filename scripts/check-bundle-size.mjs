@@ -1,10 +1,11 @@
-import { readdirSync, readFileSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 
 const BUDGETS = {
   '.js': 90 * 1024,
   '.css': 10 * 1024,
 }
+const PRECACHE_BUDGET = 400 * 1024
 
 function gzipTotal(extension) {
   const files = readdirSync('dist/assets').filter((name) => name.endsWith(extension))
@@ -24,6 +25,28 @@ for (const [extension, budget] of Object.entries(BUDGETS)) {
       `(budget ${(budget / 1024).toFixed(0)} KiB) - ${status}`,
   )
   if (actual > budget) failed = true
+}
+
+// Read the Workbox precache manifest so the offline install size is guarded
+// too. Deduplicate URLs because the manifest can list an icon twice.
+const sw = readFileSync('dist/sw.js', 'utf8')
+const urls = new Set(
+  [...sw.matchAll(/\{url:"([^"]+)",revision:/g)].map((match) => match[1]),
+)
+if (urls.size === 0) {
+  console.error('Could not read the Workbox precache manifest from dist/sw.js')
+  failed = true
+} else {
+  let total = 0
+  for (const url of urls) {
+    total += statSync(`dist/${url}`).size
+  }
+  const status = total <= PRECACHE_BUDGET ? 'ok' : 'OVER BUDGET'
+  console.log(
+    `Precache: ${(total / 1024).toFixed(1)} KiB ` +
+      `(budget ${(PRECACHE_BUDGET / 1024).toFixed(0)} KiB) - ${status}`,
+  )
+  if (total > PRECACHE_BUDGET) failed = true
 }
 
 if (failed) process.exit(1)

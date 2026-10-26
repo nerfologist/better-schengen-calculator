@@ -43,7 +43,7 @@ npm run lint            # oxlint
 npm test                # vitest watch mode (npm test -- --run for one pass)
 npm run build           # type-check + production build with PWA assets
 npm run preview         # serve the production build
-npm run size            # enforce gzipped JS/CSS budgets for dist/assets
+npm run size            # enforce gzipped JS/CSS and PWA precache budgets
 npm run verify:vendor   # check public/count.js against its pinned SHA-384
 ```
 
