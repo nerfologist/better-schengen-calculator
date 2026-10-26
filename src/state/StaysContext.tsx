@@ -58,19 +58,16 @@ const StaysContext = createContext<StaysValue | null>(null)
 export function StaysProvider({ children }: { children: ReactNode }) {
   const [stays, dispatch] = useReducer(reducer, undefined, () => load())
   const [saveFailed, setSaveFailed] = useState(false)
-  // Signature of the last payload this tab read or wrote, and a flag that
-  // suppresses writing a remote change straight back (which would ping-pong
-  // between tabs).
+  // Signature of the last payload this tab read or wrote. If the current
+  // state already matches it, there is nothing to write back (this also
+  // prevents a remote change from ping-ponging between tabs).
   const lastSeen = useRef<string | null>(null)
-  const applyingRemote = useRef(false)
 
   useEffect(() => {
-    if (applyingRemote.current) {
-      applyingRemote.current = false
-      return
-    }
+    const signature = exportJson(stays)
+    if (signature === lastSeen.current) return
     const saved = save(stays)
-    if (saved) lastSeen.current = exportJson(stays)
+    if (saved) lastSeen.current = signature
     // Storage is an external system: the write result is only known here.
     // oxlint-disable-next-line react/set-state-in-effect
     setSaveFailed(!saved)
@@ -86,7 +83,6 @@ export function StaysProvider({ children }: { children: ReactNode }) {
       const signature = exportJson(incoming)
       if (signature === lastSeen.current) return
       lastSeen.current = signature
-      applyingRemote.current = true
       dispatch({ type: 'replaceAll', stays: incoming })
     }
     window.addEventListener('storage', onStorage)
