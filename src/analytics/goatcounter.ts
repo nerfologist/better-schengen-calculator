@@ -6,7 +6,8 @@
  * empty, or in dev builds, everything here is a no-op. Only feature usage is
  * ever tracked; stay dates and labels never leave the device.
  */
-const SITE_CODE = 'nerfologist'
+import { GOATCOUNTER_ORIGIN, SITE_CODE } from './config'
+import { COUNT_JS_SHA384 } from './vendor'
 
 interface GoatCounter {
   count: (opts: { path: string; event?: boolean }) => void
@@ -19,15 +20,16 @@ declare global {
 }
 
 export function initAnalytics(): void {
-  if (!SITE_CODE || !import.meta.env.PROD) return
+  if (!SITE_CODE || !GOATCOUNTER_ORIGIN || !import.meta.env.PROD) return
 
   // count.js is vendored in public/ (originally from https://gc.zgo.at/count.js)
   // so no third-party code runs on the page and the CSP can restrict scripts
-  // to 'self'. Refresh the vendored copy occasionally.
+  // to 'self'. The SRI digest pins the exact vendored build.
   const script = document.createElement('script')
   script.async = true
   script.src = '/count.js'
-  script.dataset.goatcounter = `https://${SITE_CODE}.goatcounter.com/count`
+  script.integrity = `sha384-${COUNT_JS_SHA384}`
+  script.dataset.goatcounter = `${GOATCOUNTER_ORIGIN}/count`
   document.head.appendChild(script)
 
   window.addEventListener('error', (e) => {
