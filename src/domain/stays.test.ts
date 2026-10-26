@@ -111,19 +111,43 @@ describe('stays', () => {
   })
 
   describe('checkStayChange', () => {
-    it('refuses the add that would exceed the stay count', () => {
-      const existing = Array.from({ length: MAX_STAYS }, (_, i) =>
+    const manyStays = () =>
+      Array.from({ length: MAX_STAYS }, (_, i) =>
         stay(
           addDays('2000-01-01', i * 2),
           addDays('2000-01-01', i * 2),
           `s${i}`,
         ),
       )
+
+    it('refuses the add that would exceed the stay count', () => {
       const failure = checkStayChange(
-        existing,
+        manyStays(),
         stay('2026-01-01', '2026-01-01', 'new'),
       )
       expect(failure).toMatch(new RegExp(`${MAX_STAYS} stays`))
+    })
+
+    it('allows editing a stay without merging in its previous version', () => {
+      const existing = [stay('2020-01-01', '2021-06-01', 'a')]
+      // 700 days; merging with the old version would span 1,066 days.
+      const failure = checkStayChange(
+        existing,
+        stay('2021-01-01', '2022-12-01', 'a'),
+      )
+      expect(failure).toBeNull()
+    })
+
+    it('allows moving a stay to non-overlapping dates at the count limit', () => {
+      const existing = manyStays()
+      const target = existing[0]
+      expect(
+        checkStayChange(existing, {
+          ...target,
+          entry: '2025-01-01',
+          exit: '2025-01-01',
+        }),
+      ).toBeNull()
     })
 
     it('refuses an overlapping merge longer than the maximum', () => {

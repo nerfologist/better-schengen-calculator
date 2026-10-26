@@ -66,7 +66,12 @@ export function mergeStayInto(stays: Stay[], stay: Stay): Stay[] {
  * user-facing message, or null when the change is safe to dispatch.
  */
 export function checkStayChange(stays: Stay[], candidate: Stay): string | null {
-  const next = mergeStayInto(stays, candidate)
+  // Match the reducer's update semantics: remove the previous version of the
+  // same stay before merging, otherwise an edit would count both versions.
+  const next = mergeStayInto(
+    stays.filter((s) => s.id !== candidate.id),
+    candidate,
+  )
   if (next.length > MAX_STAYS) {
     return `You can store up to ${MAX_STAYS} stays on this device. Delete an old stay first.`
   }
