@@ -93,7 +93,7 @@ export default function App() {
           </a>{' '}
           and the authorities of the country you visit. Anonymous, cookie-free
           usage statistics are collected; your travel data never leaves your
-          device.
+          device. See the <a href="/privacy.html">privacy note</a>.
         </p>
         <p className="muted app-credits">
           Made by{' '}

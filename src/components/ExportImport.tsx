@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { track } from '../analytics/goatcounter'
 import { MAX_IMPORT_BYTES } from '../domain/limits'
 import { useStays } from '../state/StaysContext'
-import { exportJson, importJson } from '../storage/staysRepo'
+import { clearAllData, exportJson, importJson } from '../storage/staysRepo'
 
 export function ExportImport() {
   const { stays, dispatch } = useStays()
@@ -18,6 +18,23 @@ export function ExportImport() {
     a.click()
     URL.revokeObjectURL(url)
     track('backup-exported')
+  }
+
+  function doClear() {
+    if (
+      !window.confirm(
+        'Delete all stays and planning dates stored on this device? Download a backup first if you need it. This cannot be undone.',
+      )
+    ) {
+      return
+    }
+    track('data-cleared')
+    if (!clearAllData()) {
+      setMessage('Could not clear storage on this device.')
+      return
+    }
+    dispatch({ type: 'replaceAll', stays: [] })
+    window.location.reload()
   }
 
   async function doImport(file: File) {
@@ -51,6 +68,9 @@ export function ExportImport() {
       </button>
       <button className="btn" onClick={() => fileInput.current?.click()}>
         Import backup
+      </button>
+      <button type="button" className="btn btn-danger" onClick={doClear}>
+        Delete all data
       </button>
       <input
         ref={fileInput}

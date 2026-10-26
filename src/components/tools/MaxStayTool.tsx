@@ -5,6 +5,7 @@ import { MAX_SUPPORTED_ISO } from '../../domain/limits'
 import { latestExit } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
+import { PLAN_KEYS } from '../../storage/schema'
 import { usePersistedInput } from '../../ui/usePersistedInput'
 import { formatDay, formatDayShort } from '../../ui/format'
 import { CoffeeNudge } from '../CoffeeNudge'
@@ -17,7 +18,7 @@ export interface MaxStayToolProps {
 
 export function MaxStayTool({ onPreview, onRecap }: MaxStayToolProps) {
   const { mergedRanges, today } = useStays()
-  const [entry, setEntry] = usePersistedInput('schengen-calc:plan.maxEntry')
+  const [entry, setEntry] = usePersistedInput(PLAN_KEYS.maxEntry)
   // A persisted date means an ongoing calculation: start open so it shows.
   const [open, setOpen] = useState(() => entry !== '')
 

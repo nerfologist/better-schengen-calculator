@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1c2a4a" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/privacy.css" />
+    <title>Privacy note — Schengen Days</title>
+  </head>
+  <body>
+    <main>
+      <p><a href="/">← Back to Schengen Days</a></p>
+      <h1>Privacy note</h1>
+      <p>
+        Schengen Days is a static calculator. There is no account and no server
+        that receives your travel history.
+      </p>
+
+      <h2>Your stays</h2>
+      <p>
+        Stays and planning dates are stored in your browser's
+        <code>localStorage</code> on this device. They are never uploaded by the
+        app. Exporting creates a file locally; importing reads a file you choose.
+        Anyone with access to this browser profile can read the data, so use the
+        <strong>Delete all data</strong> button in the footer on a shared device.
+      </p>
+
+      <h2>Usage statistics</h2>
+      <p>
+        On the production site, anonymous, cookieless usage statistics are
+        collected with <a href="https://www.goatcounter.com">GoatCounter</a>.
+        GoatCounter receives the page path, page title, referrer, screen width,
+        browser user agent, and the request's IP address (used by the service to
+        serve and count the request). The app sends feature events such as
+        "backup-imported" or "donate-clicked"; stay dates, labels, and the
+        contents of your calendar are never included. Analytics is disabled in
+        development builds and is not used for advertising or profiling.
+      </p>
+      <p>
+        You can opt out in this browser by visiting
+        <a href="/#toggle-goatcounter">/#toggle-goatcounter</a>. The setting is
+        stored locally under the <code>skipgc</code> key and can be undone by
+        visiting the same link again.
+      </p>
+
+      <h2>Hosting</h2>
+      <p>
+        The site is served by GitHub Pages. GitHub may process standard request
+        data such as IP addresses and user agents in its server logs under its
+        own privacy terms. This site sets no cookies of its own.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions or corrections:
+        <a href="https://github.com/nerfologist/better-schengen-calculator/issues"
+          >open an issue on GitHub</a
+        >.
+      </p>
+      <p class="muted">Last updated: October 2026.</p>
+    </main>
+  </body>
+</html>

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { MAX_IMPORT_BYTES, MAX_LABEL_LENGTH, MAX_STAYS } from '../domain/limits'
 import type { Stay } from '../domain/types'
-import { CORRUPT_KEY, STORAGE_KEY } from './schema'
-import { exportJson, importJson, load, save } from './staysRepo'
+import { CORRUPT_KEY, PLAN_KEYS, STORAGE_KEY } from './schema'
+import { clearAllData, exportJson, importJson, load, save } from './staysRepo'
 
 function memoryStorage(): Storage {
   const map = new Map<string, string>()
@@ -56,6 +56,7 @@ describe('staysRepo', () => {
   it('never throws when localStorage is unavailable', () => {
     expect(save(stays, null)).toBe(false)
     expect(load(null)).toEqual([])
+    expect(clearAllData(null)).toBe(false)
   })
 
   it('returns empty on first run', () => {
@@ -81,6 +82,15 @@ describe('staysRepo', () => {
 
   it('round-trips through export/import', () => {
     expect(importJson(exportJson(stays))).toEqual(stays)
+  })
+
+  it('clears stays, quarantined data, and planning inputs', () => {
+    const storage = memoryStorage()
+    storage.setItem(STORAGE_KEY, '{"version":1,"stays":[]}')
+    storage.setItem(CORRUPT_KEY, 'broken')
+    storage.setItem(PLAN_KEYS.maxEntry, '2026-01-01')
+    expect(clearAllData(storage)).toBe(true)
+    expect(storage.length).toBe(0)
   })
 
   it('import throws descriptive errors', () => {

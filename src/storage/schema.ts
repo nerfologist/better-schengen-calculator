@@ -9,6 +9,13 @@ import type { Stay } from '../domain/types'
 export const STORAGE_KEY = 'schengen-calc:data'
 export const CORRUPT_KEY = 'schengen-calc:data.corrupt'
 
+/** Planning inputs that also live on device and should be cleared together. */
+export const PLAN_KEYS = {
+  maxEntry: 'schengen-calc:plan.maxEntry',
+  proposedStart: 'schengen-calc:plan.proposedStart',
+  proposedEnd: 'schengen-calc:plan.proposedEnd',
+} as const
+
 /** Control characters and bidi overrides that can visually spoof the UI. */
 const UNSAFE_TEXT = /[\p{Cc}\u202A-\u202E\u2066-\u2069]/u
 

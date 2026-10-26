@@ -10,6 +10,7 @@ import {
 import { checkStay } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
+import { PLAN_KEYS } from '../../storage/schema'
 import { formatDay, formatDayShort } from '../../ui/format'
 import { usePersistedInput } from '../../ui/usePersistedInput'
 import { CoffeeNudge } from '../CoffeeNudge'
@@ -22,8 +23,8 @@ export interface ProposedStayToolProps {
 
 export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) {
   const { mergedRanges } = useStays()
-  const [start, setStart] = usePersistedInput('schengen-calc:plan.proposedStart')
-  const [end, setEnd] = usePersistedInput('schengen-calc:plan.proposedEnd')
+  const [start, setStart] = usePersistedInput(PLAN_KEYS.proposedStart)
+  const [end, setEnd] = usePersistedInput(PLAN_KEYS.proposedEnd)
   // Persisted dates mean an ongoing calculation: start open so it shows.
   const [open, setOpen] = useState(() => start !== '' || end !== '')
 

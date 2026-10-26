@@ -1,6 +1,12 @@
 import { MAX_IMPORT_BYTES } from '../domain/limits'
 import type { Stay } from '../domain/types'
-import { CORRUPT_KEY, STORAGE_KEY, migrate, type PersistedV1 } from './schema'
+import {
+  CORRUPT_KEY,
+  PLAN_KEYS,
+  STORAGE_KEY,
+  migrate,
+  type PersistedV1,
+} from './schema'
 
 function pack(stays: Stay[]): PersistedV1 {
   return { version: 1, stays }
@@ -65,6 +71,22 @@ export function requestPersistence(): void {
   } catch {
     // Ignore environments that expose a partial StorageManager.
   }
+}
+
+/** Remove every key this app owns: stays, quarantined data, planning inputs. */
+export function clearAllData(
+  storage: Storage | null = defaultStorage(),
+): boolean {
+  if (!storage) return false
+  let ok = true
+  for (const key of [STORAGE_KEY, CORRUPT_KEY, ...Object.values(PLAN_KEYS)]) {
+    try {
+      storage.removeItem(key)
+    } catch {
+      ok = false
+    }
+  }
+  return ok
 }
 
 export function exportJson(stays: Stay[]): string {
