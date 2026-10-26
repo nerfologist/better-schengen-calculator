@@ -41,10 +41,19 @@ const HEADERS = `/*
 /sw.js
   Cache-Control: no-cache
 
-/index.html
+/
+  Cache-Control: no-cache
+
+/*.html
   Cache-Control: no-cache
 
 /manifest.webmanifest
+  Cache-Control: no-cache
+
+/count.js
+  Cache-Control: no-cache
+
+/privacy.css
   Cache-Control: no-cache
 `
 
