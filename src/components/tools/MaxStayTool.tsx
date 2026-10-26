@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { track } from '../../analytics/goatcounter'
 import { isValidIso, toDayNum } from '../../domain/dates'
+import { MAX_SUPPORTED_ISO } from '../../domain/limits'
 import { latestExit } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
@@ -75,6 +76,7 @@ export function MaxStayTool({ onPreview, onRecap }: MaxStayToolProps) {
             <input
               type="date"
               min={today}
+              max={MAX_SUPPORTED_ISO}
               value={entry}
               onChange={(e) => setEntry(e.target.value)}
             />

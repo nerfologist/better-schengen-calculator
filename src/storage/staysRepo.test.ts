@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { MAX_IMPORT_BYTES, MAX_LABEL_LENGTH, MAX_STAYS } from '../domain/limits'
 import type { Stay } from '../domain/types'
 import { CORRUPT_KEY, STORAGE_KEY } from './schema'
 import { exportJson, importJson, load, save } from './staysRepo'
@@ -60,5 +61,80 @@ describe('staysRepo', () => {
     expect(() =>
       importJson(JSON.stringify({ version: 1, stays: [{ id: 'x', entry: '2026-01-10', exit: '2026-01-01' }] })),
     ).toThrow(/valid backup/)
+  })
+
+  it('rejects backups larger than the import limit', () => {
+    expect(() => importJson('x'.repeat(MAX_IMPORT_BYTES + 1))).toThrow(/too large/)
+  })
+
+  it('rejects too many stays', () => {
+    const many = Array.from({ length: MAX_STAYS + 1 }, (_, i) => ({
+      id: `s${i}`,
+      entry: '2026-01-01',
+      exit: '2026-01-01',
+    }))
+    expect(() => importJson(JSON.stringify({ version: 1, stays: many }))).toThrow(
+      /valid backup/,
+    )
+  })
+
+  it('rejects duplicate stay ids', () => {
+    const duplicate = [
+      { id: 'same', entry: '2026-01-01', exit: '2026-01-01' },
+      { id: 'same', entry: '2026-02-01', exit: '2026-02-01' },
+    ]
+    expect(() => importJson(JSON.stringify({ version: 1, stays: duplicate }))).toThrow(
+      /Duplicate stay id/,
+    )
+  })
+
+  it('rejects dates outside the supported range', () => {
+    for (const [entry, exit] of [
+      ['1899-12-31', '1900-01-01'],
+      ['2100-12-31', '2101-01-01'],
+    ]) {
+      expect(() =>
+        importJson(JSON.stringify({ version: 1, stays: [{ id: 'x', entry, exit }] })),
+      ).toThrow(/valid backup/)
+    }
+  })
+
+  it('rejects stays longer than the supported maximum', () => {
+    expect(() =>
+      importJson(
+        JSON.stringify({
+          version: 1,
+          stays: [{ id: 'x', entry: '2026-01-01', exit: '2028-01-01' }],
+        }),
+      ),
+    ).toThrow(/valid backup/)
+  })
+
+  it('accepts a stay at the maximum length', () => {
+    expect(
+      importJson(
+        JSON.stringify({
+          version: 1,
+          stays: [{ id: 'x', entry: '2026-01-01', exit: '2027-12-31' }],
+        }),
+      ),
+    ).toHaveLength(1)
+  })
+
+  it('rejects oversized or unsafe labels', () => {
+    const base = { id: 'x', entry: '2026-01-01', exit: '2026-01-01' }
+    for (const label of ['x'.repeat(MAX_LABEL_LENGTH + 1), 'Paris\u202E']) {
+      expect(() =>
+        importJson(JSON.stringify({ version: 1, stays: [{ ...base, label }] })),
+      ).toThrow(/valid backup/)
+    }
+    expect(
+      importJson(
+        JSON.stringify({
+          version: 1,
+          stays: [{ ...base, label: 'x'.repeat(MAX_LABEL_LENGTH) }],
+        }),
+      ),
+    ).toHaveLength(1)
   })
 })

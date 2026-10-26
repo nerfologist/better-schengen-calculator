@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { MAX_LABEL_LENGTH } from '../../domain/limits'
 import type { DayRange } from '../../domain/types'
 import { formatDay } from '../../ui/format'
 
@@ -69,7 +70,7 @@ export function ConfirmStayDialog({ range, todayNum, onConfirm, onCancel }: Conf
           <input
             type="text"
             placeholder="e.g. Paris trip"
-            maxLength={60}
+            maxLength={MAX_LABEL_LENGTH}
             value={label}
             onChange={(e) => setLabel(e.target.value)}
           />

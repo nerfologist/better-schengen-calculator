@@ -1,5 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { isValidIso, toDayNum } from '../domain/dates'
+import {
+  MAX_LABEL_LENGTH,
+  MAX_RECORDED_STAY_DAYS,
+  MAX_SUPPORTED_ISO,
+  MIN_SUPPORTED_ISO,
+  isSupportedStay,
+} from '../domain/limits'
 import type { Stay } from '../domain/types'
 
 export interface StayFormProps {
@@ -24,6 +31,12 @@ export function StayForm({ initial, onSave, onCancel }: StayFormProps) {
       setError('Exit date is before entry date.')
       return
     }
+    if (!isSupportedStay(entry, exit)) {
+      setError(
+        `Use dates between ${MIN_SUPPORTED_ISO} and ${MAX_SUPPORTED_ISO}, with a stay of at most ${MAX_RECORDED_STAY_DAYS} days.`,
+      )
+      return
+    }
     setError(null)
     onSave({ entry, exit, label: label.trim() || undefined })
     if (!initial) {
@@ -42,7 +55,8 @@ export function StayForm({ initial, onSave, onCancel }: StayFormProps) {
             type="date"
             required
             value={entry}
-            max={exit || undefined}
+            min={MIN_SUPPORTED_ISO}
+            max={exit || MAX_SUPPORTED_ISO}
             onChange={(e) => setEntry(e.target.value)}
           />
         </label>
@@ -52,7 +66,8 @@ export function StayForm({ initial, onSave, onCancel }: StayFormProps) {
             type="date"
             required
             value={exit}
-            min={entry || undefined}
+            min={entry || MIN_SUPPORTED_ISO}
+            max={MAX_SUPPORTED_ISO}
             onChange={(e) => setExit(e.target.value)}
           />
         </label>
@@ -63,7 +78,7 @@ export function StayForm({ initial, onSave, onCancel }: StayFormProps) {
           <input
             type="text"
             placeholder="e.g. Paris trip"
-            maxLength={60}
+            maxLength={MAX_LABEL_LENGTH}
             value={label}
             onChange={(e) => setLabel(e.target.value)}
           />

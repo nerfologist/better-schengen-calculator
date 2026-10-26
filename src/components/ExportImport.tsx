@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { track } from '../analytics/goatcounter'
+import { MAX_IMPORT_BYTES } from '../domain/limits'
 import { useStays } from '../state/StaysContext'
 import { exportJson, importJson } from '../storage/staysRepo'
 
@@ -21,6 +22,11 @@ export function ExportImport() {
 
   async function doImport(file: File) {
     try {
+      if (file.size > MAX_IMPORT_BYTES) {
+        throw new Error(
+          `Backup file is too large (max ${Math.round(MAX_IMPORT_BYTES / 1000)} KB)`,
+        )
+      }
       const imported = importJson(await file.text())
       if (
         stays.length > 0 &&

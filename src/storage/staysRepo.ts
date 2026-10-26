@@ -1,3 +1,4 @@
+import { MAX_IMPORT_BYTES } from '../domain/limits'
 import type { Stay } from '../domain/types'
 import { CORRUPT_KEY, STORAGE_KEY, migrate, type PersistedV1 } from './schema'
 
@@ -34,6 +35,9 @@ export function exportJson(stays: Stay[]): string {
 
 /** Parse a backup file. Throws a descriptive Error on invalid content. */
 export function importJson(text: string): Stay[] {
+  if (text.length > MAX_IMPORT_BYTES) {
+    throw new Error('Backup file is too large')
+  }
   let parsed: unknown
   try {
     parsed = JSON.parse(text)

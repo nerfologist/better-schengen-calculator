@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { track } from '../../analytics/goatcounter'
 import { isValidIso, toDayNum } from '../../domain/dates'
+import {
+  MAX_RECORDED_STAY_DAYS,
+  MAX_SUPPORTED_ISO,
+  MIN_SUPPORTED_ISO,
+  isSupportedStay,
+} from '../../domain/limits'
 import { checkStay } from '../../domain/schengen'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
@@ -22,10 +28,18 @@ export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) 
   const [open, setOpen] = useState(() => start !== '' || end !== '')
 
   const range = useMemo<DayRange | null>(() => {
-    if (!isValidIso(start) || !isValidIso(end)) return null
-    const r = { start: toDayNum(start), end: toDayNum(end) }
-    return r.end >= r.start ? r : null
+    if (!isValidIso(start) || !isValidIso(end) || !isSupportedStay(start, end)) {
+      return null
+    }
+    return { start: toDayNum(start), end: toDayNum(end) }
   }, [start, end])
+
+  const invalidRange =
+    start !== '' &&
+    end !== '' &&
+    isValidIso(start) &&
+    isValidIso(end) &&
+    !isSupportedStay(start, end)
 
   const result = useMemo(
     () => (range ? checkStay(mergedRanges, range.start, range.end) : null),
@@ -74,7 +88,8 @@ export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) 
             Entry
             <input
               type="date"
-              max={end || undefined}
+              min={MIN_SUPPORTED_ISO}
+              max={end || MAX_SUPPORTED_ISO}
               value={start}
               onChange={(e) => setStart(e.target.value)}
             />
@@ -83,7 +98,8 @@ export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) 
             Exit
             <input
               type="date"
-              min={start || undefined}
+              min={start || MIN_SUPPORTED_ISO}
+              max={MAX_SUPPORTED_ISO}
               value={end}
               onChange={(e) => setEnd(e.target.value)}
             />
@@ -101,6 +117,12 @@ export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) 
             </button>
           )}
         </div>
+        {invalidRange && (
+          <p className="form-error" role="alert">
+            Enter dates between {MIN_SUPPORTED_ISO} and {MAX_SUPPORTED_ISO} with a
+            stay of at most {MAX_RECORDED_STAY_DAYS} days.
+          </p>
+        )}
         {range && result?.compliant && (
           <>
             <p className="tool-result is-ok" role="status">

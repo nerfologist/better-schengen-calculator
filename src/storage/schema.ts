@@ -1,8 +1,16 @@
-import { isValidIso, toDayNum } from '../domain/dates'
+import { isValidIso } from '../domain/dates'
+import {
+  MAX_LABEL_LENGTH,
+  MAX_STAYS,
+  isSupportedStay,
+} from '../domain/limits'
 import type { Stay } from '../domain/types'
 
 export const STORAGE_KEY = 'schengen-calc:data'
 export const CORRUPT_KEY = 'schengen-calc:data.corrupt'
+
+/** Control characters and bidi overrides that can visually spoof the UI. */
+const UNSAFE_TEXT = /[\p{Cc}\u202A-\u202E\u2066-\u2069]/u
 
 export interface PersistedV1 {
   version: 1
@@ -12,16 +20,27 @@ export interface PersistedV1 {
 export function isStay(value: unknown): value is Stay {
   if (typeof value !== 'object' || value === null) return false
   const v = value as Record<string, unknown>
-  return (
-    typeof v.id === 'string' &&
-    v.id.length > 0 &&
-    typeof v.entry === 'string' &&
-    isValidIso(v.entry) &&
-    typeof v.exit === 'string' &&
-    isValidIso(v.exit) &&
-    toDayNum(v.entry) <= toDayNum(v.exit) &&
-    (v.label === undefined || typeof v.label === 'string')
-  )
+  if (
+    typeof v.id !== 'string' ||
+    v.id.length === 0 ||
+    v.id.length > 64 ||
+    UNSAFE_TEXT.test(v.id)
+  ) {
+    return false
+  }
+  if (typeof v.entry !== 'string' || !isValidIso(v.entry)) return false
+  if (typeof v.exit !== 'string' || !isValidIso(v.exit)) return false
+  if (!isSupportedStay(v.entry, v.exit)) return false
+  if (v.label !== undefined) {
+    if (
+      typeof v.label !== 'string' ||
+      v.label.length > MAX_LABEL_LENGTH ||
+      UNSAFE_TEXT.test(v.label)
+    ) {
+      return false
+    }
+  }
+  return true
 }
 
 /** Validate and upgrade raw parsed JSON to the current schema. Throws if unusable. */
@@ -30,8 +49,17 @@ export function migrate(raw: unknown): PersistedV1 {
   const v = raw as Record<string, unknown>
   switch (v.version) {
     case 1: {
-      if (!Array.isArray(v.stays) || !v.stays.every(isStay)) {
+      if (
+        !Array.isArray(v.stays) ||
+        v.stays.length > MAX_STAYS ||
+        !v.stays.every(isStay)
+      ) {
         throw new Error('Invalid stays payload')
+      }
+      const ids = new Set<string>()
+      for (const stay of v.stays) {
+        if (ids.has(stay.id)) throw new Error(`Duplicate stay id: ${stay.id}`)
+        ids.add(stay.id)
       }
       // Keep only known fields so imported files can't smuggle extra data
       // into localStorage.
