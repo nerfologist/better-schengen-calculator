@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { track } from '../analytics/goatcounter'
 import { toDayNum } from '../domain/dates'
+import { checkStayChange } from '../domain/stays'
 import type { Stay } from '../domain/types'
 import { useStays } from '../state/StaysContext'
 import { formatDayShort } from '../ui/format'
@@ -35,8 +36,12 @@ export function StayList() {
           <StayForm
             initial={stay}
             onSave={(updated) => {
-              dispatch({ type: 'update', stay: { ...updated, id: stay.id } })
+              const candidate = { ...updated, id: stay.id }
+              const failure = checkStayChange(stays, candidate)
+              if (failure) return failure
+              dispatch({ type: 'update', stay: candidate })
               setEditingId(null)
+              return null
             }}
             onCancel={() => setEditingId(null)}
           />
@@ -92,8 +97,14 @@ export function StayList() {
       <h3 className="add-stay-title">Add a stay</h3>
       <StayForm
         onSave={(stay) => {
+          const failure = checkStayChange(stays, {
+            ...stay,
+            id: crypto.randomUUID(),
+          })
+          if (failure) return failure
           dispatch({ type: 'add', stay })
           track('stay-added-form')
+          return null
         }}
       />
     </section>

@@ -12,7 +12,8 @@ import type { Stay } from '../domain/types'
 
 export interface StayFormProps {
   initial?: Stay
-  onSave: (stay: Omit<Stay, 'id'>) => void
+  /** Return a user-facing error to keep the form open, or null on success. */
+  onSave: (stay: Omit<Stay, 'id'>) => string | null
   onCancel?: () => void
 }
 
@@ -38,8 +39,12 @@ export function StayForm({ initial, onSave, onCancel }: StayFormProps) {
       )
       return
     }
+    const failure = onSave({ entry, exit, label: cleanLabel(label) })
+    if (failure) {
+      setError(failure)
+      return
+    }
     setError(null)
-    onSave({ entry, exit, label: cleanLabel(label) })
     if (!initial) {
       setEntry('')
       setExit('')

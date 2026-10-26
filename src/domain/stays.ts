@@ -1,4 +1,5 @@
 import { toDayNum, toIso } from './dates'
+import { MAX_RECORDED_STAY_DAYS, MAX_STAYS } from './limits'
 import type { DayRange, Stay } from './types'
 
 export function toRanges(stays: Stay[]): DayRange[] {
@@ -58,4 +59,21 @@ export function mergeStayInto(stays: Stay[], stay: Stay): Stay[] {
     label: stay.label ?? overlapping.find((s) => s.label)?.label,
   }
   return [...stays.filter((s) => !overlapping.includes(s)), merged]
+}
+
+/**
+ * Check an add or update against the storage limits AFTER merging. Returns a
+ * user-facing message, or null when the change is safe to dispatch.
+ */
+export function checkStayChange(stays: Stay[], candidate: Stay): string | null {
+  const next = mergeStayInto(stays, candidate)
+  if (next.length > MAX_STAYS) {
+    return `You can store up to ${MAX_STAYS} stays on this device. Delete an old stay first.`
+  }
+  for (const s of next) {
+    if (toDayNum(s.exit) - toDayNum(s.entry) + 1 > MAX_RECORDED_STAY_DAYS) {
+      return `Adding this stay would create a period longer than ${MAX_RECORDED_STAY_DAYS} days. Shorten the dates.`
+    }
+  }
+  return null
 }

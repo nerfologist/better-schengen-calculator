@@ -14,7 +14,7 @@ export const MAX_SUPPORTED_DAY = toDayNum(MAX_SUPPORTED_ISO)
 export const MAX_RECORDED_STAY_DAYS = 730
 
 /** Guards against pathological backups filling storage and render work. */
-export const MAX_STAYS = 200
+export const MAX_STAYS = 2000
 export const MAX_LABEL_LENGTH = 60
 export const MAX_IMPORT_BYTES = 1_000_000
 

@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { toDayNum } from './dates'
-import { mergeRanges, mergeStayInto, mergedRangesOf, rangeLength, toRanges } from './stays'
+import { addDays, toDayNum } from './dates'
+import { MAX_STAYS } from './limits'
+import {
+  checkStayChange,
+  mergeRanges,
+  mergeStayInto,
+  mergedRangesOf,
+  rangeLength,
+  toRanges,
+} from './stays'
 import type { Stay } from './types'
 
 function stay(entry: string, exit: string, id = 'x'): Stay {
@@ -100,5 +108,41 @@ describe('stays', () => {
     const snapshot = JSON.parse(JSON.stringify(input))
     mergeRanges(input)
     expect(input).toEqual(snapshot)
+  })
+
+  describe('checkStayChange', () => {
+    it('refuses the add that would exceed the stay count', () => {
+      const existing = Array.from({ length: MAX_STAYS }, (_, i) =>
+        stay(
+          addDays('2000-01-01', i * 2),
+          addDays('2000-01-01', i * 2),
+          `s${i}`,
+        ),
+      )
+      const failure = checkStayChange(
+        existing,
+        stay('2026-01-01', '2026-01-01', 'new'),
+      )
+      expect(failure).toMatch(new RegExp(`${MAX_STAYS} stays`))
+    })
+
+    it('refuses an overlapping merge longer than the maximum', () => {
+      const existing = [stay('2020-01-01', '2021-06-01', 'a')]
+      const failure = checkStayChange(
+        existing,
+        stay('2021-06-01', '2022-12-31', 'b'),
+      )
+      expect(failure).toMatch(/730 days/)
+    })
+
+    it('allows a normal add and overlap', () => {
+      expect(checkStayChange([], stay('2026-01-01', '2026-01-05', 'a'))).toBeNull()
+      expect(
+        checkStayChange(
+          [stay('2026-01-01', '2026-01-05', 'a')],
+          stay('2026-01-05', '2026-01-10', 'b'),
+        ),
+      ).toBeNull()
+    })
   })
 })

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { track } from '../../analytics/goatcounter'
 import { toDayNum, toIso, type DayNum } from '../../domain/dates'
+import { checkStayChange } from '../../domain/stays'
 import type { DayRange } from '../../domain/types'
 import { useStays } from '../../state/StaysContext'
 import { formatDay } from '../../ui/format'
@@ -23,7 +24,7 @@ export interface TimelineProps {
 }
 
 export function Timeline({ preview }: TimelineProps) {
-  const { mergedRanges, summary, today, dispatch } = useStays()
+  const { stays, mergedRanges, summary, today, dispatch } = useStays()
   const todayNum = toDayNum(today)
   const previewEnd = preview?.end
 
@@ -54,16 +55,22 @@ export function Timeline({ preview }: TimelineProps) {
   }, [])
   const onConfirm = useCallback(
     (label?: string) => {
-      if (confirmRange) {
-        dispatch({
-          type: 'add',
-          stay: { entry: toIso(confirmRange.start), exit: toIso(confirmRange.end), label },
-        })
-        track('stay-added-tap')
-      }
+      if (!confirmRange) return null
+      const entry = toIso(confirmRange.start)
+      const exit = toIso(confirmRange.end)
+      const failure = checkStayChange(stays, {
+        id: crypto.randomUUID(),
+        entry,
+        exit,
+        label,
+      })
+      if (failure) return failure
+      dispatch({ type: 'add', stay: { entry, exit, label } })
+      track('stay-added-tap')
       setConfirmRange(null)
+      return null
     },
-    [confirmRange, dispatch],
+    [confirmRange, dispatch, stays],
   )
 
   useEffect(() => {

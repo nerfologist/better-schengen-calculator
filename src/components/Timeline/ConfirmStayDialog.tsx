@@ -6,19 +6,22 @@ import { formatDay } from '../../ui/format'
 export interface ConfirmStayDialogProps {
   range: DayRange | null
   todayNum: number
-  onConfirm: (label?: string) => void
+  /** Return a user-facing error to keep the dialog open, or null on success. */
+  onConfirm: (label?: string) => string | null
   onCancel: () => void
 }
 
 export function ConfirmStayDialog({ range, todayNum, onConfirm, onCancel }: ConfirmStayDialogProps) {
   const ref = useRef<HTMLDialogElement>(null)
   const [label, setLabel] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const dialog = ref.current
     if (!dialog) return
     if (range && !dialog.open) {
       setLabel('')
+      setError(null)
       dialog.showModal()
     }
     if (!range && dialog.open) dialog.close()
@@ -31,7 +34,12 @@ export function ConfirmStayDialog({ range, todayNum, onConfirm, onCancel }: Conf
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    onConfirm(cleanLabel(label))
+    const failure = onConfirm(cleanLabel(label))
+    if (failure) {
+      setError(failure)
+      return
+    }
+    setError(null)
   }
 
   return (
@@ -75,6 +83,11 @@ export function ConfirmStayDialog({ range, todayNum, onConfirm, onCancel }: Conf
             onChange={(e) => setLabel(e.target.value)}
           />
         </label>
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
         <div className="confirm-actions">
           <button type="button" className="btn" onClick={onCancel}>
             Cancel
