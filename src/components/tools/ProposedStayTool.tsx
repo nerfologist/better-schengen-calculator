@@ -70,11 +70,18 @@ export function ProposedStayTool({ onPreview, onRecap }: ProposedStayToolProps) 
             },
       )
     }
-    return () => {
+  }, [range, result, onPreview, onRecap])
+
+  // Clear the shared preview only when this tool unmounts; doing it in the
+  // update effect above would null it and immediately set it again on every
+  // keystroke, doubling the parent render.
+  useEffect(
+    () => () => {
       onPreview(null)
       onRecap(null)
-    }
-  }, [range, result, onPreview, onRecap])
+    },
+    [onPreview, onRecap],
+  )
 
   return (
     <details

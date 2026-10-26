@@ -1,6 +1,6 @@
 import type { DayNum } from '../../domain/dates'
 import type { DayRange } from '../../domain/types'
-import { formatMonth } from '../../ui/format'
+import { formatDay, formatMonth } from '../../ui/format'
 import { DayCell } from './DayCell'
 
 const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -17,6 +17,10 @@ export interface MonthGridProps {
 }
 
 const MS_PER_DAY = 86_400_000
+
+function inRange(day: DayNum, range: DayRange): boolean {
+  return range.start <= day && day <= range.end
+}
 
 export function MonthGrid({
   year,
@@ -54,11 +58,15 @@ export function MonthGrid({
             <DayCell
               key={day}
               day={day}
-              merged={merged}
-              window={window}
-              todayNum={todayNum}
-              preview={preview}
-              pendingStart={pendingStart}
+              dayOfMonth={i - offset + 1}
+              label={formatDay(day)}
+              hasPresence={merged.some((r) => inRange(day, r))}
+              inWindow={inRange(day, window)}
+              isPlanned={day > todayNum}
+              isToday={day === todayNum}
+              isWindowStart={day === window.start}
+              isPreview={preview !== null && inRange(day, preview)}
+              isPending={day === pendingStart}
               onTap={onTap}
             />
           ),

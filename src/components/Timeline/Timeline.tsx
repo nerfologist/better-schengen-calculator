@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { track } from '../../analytics/goatcounter'
 import { toDayNum, toIso, type DayNum } from '../../domain/dates'
 import type { DayRange } from '../../domain/types'
@@ -31,20 +31,27 @@ export function Timeline({ preview }: TimelineProps) {
   // confirmation dialog, and confirming records the stay.
   const [pendingStart, setPendingStart] = useState<DayNum | null>(null)
   const [confirmRange, setConfirmRange] = useState<DayRange | null>(null)
-  const onTap = useCallback(
-    (day: DayNum) => {
-      if (pendingStart === null) {
-        setPendingStart(day)
-        return
-      }
-      setConfirmRange({
-        start: Math.min(pendingStart, day),
-        end: Math.max(pendingStart, day),
-      })
-      setPendingStart(null)
-    },
-    [pendingStart],
-  )
+  // Keep the click handler identity stable: a new handler would defeat the
+  // memoized day cells on every tap.
+  const pendingRef = useRef<DayNum | null>(null)
+  const cancelPending = useCallback(() => {
+    pendingRef.current = null
+    setPendingStart(null)
+  }, [])
+  const onTap = useCallback((day: DayNum) => {
+    const start = pendingRef.current
+    if (start === null) {
+      pendingRef.current = day
+      setPendingStart(day)
+      return
+    }
+    pendingRef.current = null
+    setPendingStart(null)
+    setConfirmRange({
+      start: Math.min(start, day),
+      end: Math.max(start, day),
+    })
+  }, [])
   const onConfirm = useCallback(
     (label?: string) => {
       if (confirmRange) {
@@ -62,11 +69,11 @@ export function Timeline({ preview }: TimelineProps) {
   useEffect(() => {
     if (pendingStart === null) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setPendingStart(null)
+      if (e.key === 'Escape') cancelPending()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [pendingStart])
+  }, [pendingStart, cancelPending])
 
   // When a planning tool produces a result, bring its exit date into view.
   useEffect(() => {
@@ -107,7 +114,7 @@ export function Timeline({ preview }: TimelineProps) {
             <strong>{formatDay(pendingStart)}</strong>: now tap the last day (the same
             day works for a 1-day stay).
           </span>
-          <button type="button" className="btn btn-small" onClick={() => setPendingStart(null)}>
+          <button type="button" className="btn btn-small" onClick={cancelPending}>
             Cancel
           </button>
         </p>
